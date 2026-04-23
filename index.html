@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bent Tree Bible — Attendance</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#252542; --navy-l:#2e2e55; --green:#70A145; --green-l:#6CBE4B;
+  --slate:#444A54; --steel:#7C939B; --steel-l:#b0c4cc;
+  --cream:#f7f8f6; --white:#fff;
+  --g50:#f4f5f3; --g100:#eaece8; --g200:#d4d8d0; --g400:#9aa098; --g600:#5a6058; --g800:#252820;
+  --pos:#2d7a4f;   --pos-bg:#e8f5ee;
+  --neg:#c0392b;   --neg-bg:#fcecea;
+  --yel:#8a6d00;   --yel-bg:#fef9e7;
+  --sh:0 1px 3px rgba(0,0,0,.08); --sh2:0 4px 16px rgba(0,0,0,.10); --sh3:0 8px 32px rgba(0,0,0,.13);
+  --r:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito Sans',sans-serif;background:var(--cream);color:var(--g800);font-size:15px;line-height:1.5}
+button{cursor:pointer;font-family:inherit}a{color:var(--navy)}
+h1,h2,h3,.display{font-family:'Bebas Neue',sans-serif;letter-spacing:.5px}
+
+/* HEADER */
+header{background:var(--navy);color:#fff;padding:0}
+.hi{max-width:1140px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ht{display:flex;align-items:center;gap:13px}
+.ht h1{font-family:'Bebas Neue',sans-serif;font-size:26px;font-weight:400;letter-spacing:1px}
+.ht .sub{font-size:11px;color:rgba(255,255,255,.55);font-weight:300;margin-top:1px;font-family:'Nunito Sans',sans-serif;letter-spacing:.5px;text-transform:uppercase}
+.logo-icon{width:44px;height:44px;flex-shrink:0}
+nav{display:flex;gap:3px;flex-wrap:wrap}
+nav button{background:transparent;border:none;color:rgba(255,255,255,.65);padding:7px 13px;border-radius:6px;font-size:13px;font-weight:600;transition:all .15s;white-space:nowrap;font-family:'Nunito Sans',sans-serif;text-transform:uppercase;letter-spacing:.4px;font-size:11.5px}
+nav button:hover{background:rgba(255,255,255,.1);color:#fff}
+nav button.active{background:var(--green);color:#fff;font-weight:700}
+
+/* LAYOUT */
+main{max-width:1140px;margin:0 auto;padding:24px}
+.page{display:none}.page.active{display:block}
+
+/* CARDS */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--g200);overflow:hidden;margin-bottom:20px}
+.ch{padding:14px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.ch h2{font-family:'Bebas Neue',sans-serif;font-size:20px;font-weight:400;color:var(--navy);letter-spacing:.5px}
+.cb{padding:18px 20px}
+
+/* CONTROLS */
+.ctrl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ctrl label{font-size:12px;color:var(--g600);font-weight:500}
+.ctrl input,.ctrl select{border:1.5px solid var(--g200);border-radius:6px;padding:5px 9px;font-size:13px;font-family:inherit;color:var(--g800);background:#fff}
+.ctrl input:focus,.ctrl select:focus{outline:none;border-color:var(--gold)}
+
+/* REPORT TABLE */
+.rt{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.rt th{background:var(--navy);color:#fff;padding:6px 7px;text-align:right;font-weight:600;font-size:10.5px;white-space:normal;line-height:1.25;font-family:'Nunito Sans',sans-serif;text-transform:uppercase;letter-spacing:.3px;word-break:break-word}
+.rt th:first-child{text-align:left;min-width:130px;width:16%}
+.rt td{padding:6px 7px;text-align:right;border-bottom:1px solid var(--g100);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.rt td:first-child{text-align:left;color:var(--g800)}
+.rt tr.sec td{background:var(--navy);color:#fff;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:5px 7px;font-family:'Bebas Neue',sans-serif;font-size:13px}
+.rt tr.sub td{background:var(--g50);font-weight:700;color:var(--navy)}
+.rt tr.grd td{background:var(--navy);color:#fff;font-weight:700}
+.rt tr:not(.sec):not(.grd):hover td{background:var(--g50)}
+.rt tr.sub:hover td,.rt tr.grd:hover td{background:inherit}
+.num{font-variant-numeric:tabular-nums}
+.z{color:var(--g400)}
+
+/* BADGES */
+.b{display:inline-block;padding:2px 7px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.bg{background:var(--pos-bg);color:var(--pos)}
+.br{background:var(--neg-bg);color:var(--neg)}
+.by{background:var(--yel-bg);color:var(--yel)}
+.bn{color:var(--g400);font-size:11px}
+
+/* SUMMARY STRIP */
+.ss{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.sc{background:#fff;border-radius:var(--r);border:1px solid var(--g200);padding:14px 16px;box-shadow:var(--sh)}
+.sc .sl{font-size:10px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;font-family:'Nunito Sans',sans-serif}
+.sc .sv{font-family:'Bebas Neue',sans-serif;font-size:28px;font-weight:400;color:var(--navy);line-height:1;letter-spacing:.5px}
+.sc .ss2{font-size:11px;color:var(--g400);margin-top:3px}
+.sc .sb{margin-top:5px}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:580px){.fg{grid-template-columns:1fr}}
+.st{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.8px;margin:6px 0 8px;grid-column:1/-1;padding-top:6px;border-top:1px solid var(--g100)}
+.st:first-child{border-top:none;padding-top:0;margin-top:0}
+.fl{display:flex;flex-direction:column;gap:3px}
+.fl label{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.4px}
+.fl input,.fl select{border:1.5px solid var(--g200);border-radius:6px;padding:7px 9px;font-size:14px;font-family:'Nunito Sans',sans-serif;color:var(--g800);background:#fff;transition:border .15s}
+.fl input:focus,.fl select:focus{outline:none;border-color:var(--green)}
+.ff{grid-column:1/-1}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:7px;font-size:12px;font-weight:700;border:none;transition:all .15s;white-space:nowrap;text-transform:uppercase;letter-spacing:.5px;font-family:'Nunito Sans',sans-serif}
+.bp{background:var(--navy);color:#fff}.bp:hover{background:var(--navy-l)}
+.bg2{background:var(--green);color:#fff}.bg2:hover{background:var(--green-l)}
+.bs{padding:5px 11px;font-size:11px}
+.fa{display:flex;gap:8px;align-items:center;margin-top:2px;grid-column:1/-1;flex-wrap:wrap}
+
+/* HISTORY */
+.ht2{width:100%;border-collapse:collapse;font-size:13px}
+.ht2 th{background:var(--navy);color:#fff;padding:7px 10px;text-align:right;font-weight:700;font-size:11px;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px}
+.ht2 th:first-child{text-align:left}
+.ht2 td{padding:6px 10px;text-align:right;border-bottom:1px solid var(--g100)}
+.ht2 td:first-child{text-align:left}
+.ht2 tr:hover td{background:var(--g50)}
+.tag{display:inline-block;padding:1px 6px;background:#eef5e8;color:#3a5c1e;border:1px solid #b8d9a0;border-radius:10px;font-size:10px;font-weight:700;margin-left:3px;text-transform:uppercase;letter-spacing:.3px}
+.tag-blue{background:#e8f0fb;color:#1a3a7a;border-color:#b3c6ef}
+
+/* NOTICE */
+.notice{border-radius:7px;padding:10px 14px;font-size:13px;font-weight:500;margin-bottom:14px;display:none}
+.notice.show{display:block}
+.notice-gold{background:#eef5e8;border:1px solid var(--green);color:#3a5c1e}
+.notice-blue{background:#e8f0fb;border:1px solid #b3c6ef;color:#1a3a7a}
+.notice-warn{background:#fcecea;border:1px solid #f5c6c2;color:var(--neg)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:var(--sh3);transform:translateY(70px);opacity:0;transition:all .3s;z-index:9999;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--green)}.toast.err{background:var(--neg)}
+
+/* PRINT STYLES */
+@page { size: letter landscape; margin: 0.4in 0.35in; }
+@media print {
+  header, nav, .no-print { display: none !important; }
+  body { background: #fff; font-size: 9.5px; }
+  main { padding: 0; max-width: 100%; }
+
+  /* Only show the page being printed */
+  .page { display: none !important; }
+  body.print-weekly  #page-weekly  { display: block !important; }
+  body.print-monthly #page-monthly { display: block !important; }
+  body.print-service #page-service { display: block !important; }
+
+  .card { box-shadow: none; border: none; margin: 0; }
+  .ch { padding: 6px 0; border-bottom: 2px solid var(--navy); }
+  .cb { padding: 6px 0; }
+
+  /* Shrink table to fit landscape letter in one pass */
+  .rt th { font-size: 8px; padding: 4px 5px; line-height: 1.2; }
+  .rt td { font-size: 9px; padding: 3px 5px; }
+  .rt tr.sec td { font-size: 11px; padding: 4px 5px; }
+
+  /* Summary strip — 5 cards in a row */
+  .ss { grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 10px; }
+  .sc { border: 1px solid #ccc; padding: 6px 8px; }
+  .sc .sv { font-size: 20px; }
+  .sc .sl { font-size: 8px; }
+
+  /* Color key and explainer — smaller */
+  .key { font-size: 9px; margin-top: 6px; }
+  .notice { padding: 6px 10px; font-size: 10px; margin-bottom: 8px; }
+  .print-header { display: block !important; }
+
+  /* Explainer box — hide on print to save space */
+  .moving-avg-explainer { display: none !important; }
+
+  /* Prevent page breaks inside the table */
+  .rt { page-break-inside: avoid; }
+  table { width: 100%; }
+}
+.print-header{display:none;margin-bottom:10px;padding-bottom:8px;border-bottom:3px solid var(--navy)}
+.print-header h2{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--navy);letter-spacing:.5px}
+.print-header p{font-size:11px;color:var(--g600);margin-top:2px}
+
+/* KEY */
+.key{font-size:11px;color:var(--g400);margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+@media(max-width:700px){
+  .hi{flex-direction:column;align-items:flex-start}
+  nav{width:100%;overflow-x:auto}
+  main{padding:14px}
+  .ss{grid-template-columns:1fr 1fr}
+  .rt,.ht2{font-size:12px}
+  .rt th,.rt td,.ht2 th,.ht2 td{padding:5px 7px}
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="hi">
+  <div class="ht">
+    <svg class="logo-icon" viewBox="0 0 272.03 276" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#fff" stroke-width="0" d="m120.45,156.77s-24.43,9.64-24.77,14.09c0,0-5.36-6.84-2.61-13.06,0,0,12.96-7.73,29.43-12.34,0,0,16.32-39.26,21.58-43.67l1.31,2.24s-14.08,33.54-12.66,37.6c0,0,26.37-6.24,29.74-4.79l1.03,5.21s-28.77,7.48-33.06,10.59c0,0-3.76,40.93-2.19,48.74,0,0,30.37-.79,37.29-22.13,0,0,8.54-16.9,5.01-69.23,0,0-2.2-50.15-.13-52.25,0,0-43.65,26.88-48.8,31.76,0,0-63.3,44.09-22.26,111.54l1.16,5.72s-43.95-28.65-26.66-76.55c0,0,7.27-28.96,62.21-60.59,0,0,18.65-10.84,34.05-21.54c-10.67-3.82-22.12-6-34.1-6c-56.07,0-101.52,45.45-101.52,101.51c0,49.63,35.63,90.88,82.7,99.71c-4.5-21.34-6.15-50.74,3.25-86.58Z"/>
+      <path fill="#fff" stroke-width="0" d="m182.42,53.43c-2.82,9.49-4.92,22.19-3.47,37.34,0,0,3.44,36.62,4.65,47.51,0,0,9.73,78.51-55.25,78.9,0,0,1.63,13.24,7.39,27.98c.09,0,.17,0,.26,0c56.06,0,101.52-45.45,101.52-101.52c0-39.32-22.41-73.36-55.11-90.22Z"/>
+    </svg>
+    <div>
+      <h1>Bent Tree Bible</h1>
+      <div class="sub">Attendance Tracker</div>
+    </div>
+  </div>
+  <nav>
+    <button class="active" onclick="nav('weekly')">Weekly Report</button>
+    <button onclick="nav('monthly')">Monthly Report</button>
+    <button onclick="nav('service')">Service Breakdown</button>
+    <button onclick="nav('entry')">Enter Data</button>
+    <button onclick="nav('history')">History</button>
+    <button onclick="nav('settings')">⚙ Data</button>
+  </nav>
+</div>
+</header>
+
+<main>
+
+<!-- ══ WEEKLY ══ -->
+<div id="page-weekly" class="page active">
+  <div class="card">
+    <div class="ch">
+      <h2>Weekly Attendance Report</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="ctrl"><label>Sunday:</label><input type="date" id="wk-date" onchange="renderWeekly()"></div>
+        <button class="btn bp bs no-print" onclick="printWeekly()">🖨 Print / Save PDF</button>
+      </div>
+    </div>
+    <div class="cb">
+      <div class="print-header">
+        <h2>Bent Tree Bible — Weekly Attendance Report</h2>
+        <p id="print-wk-date"></p>
+      </div>
+      <div id="wk-holiday" class="notice notice-gold"></div>
+      <div id="wk-together" class="notice notice-blue"></div>
+      <div class="ss" id="wk-summary"></div>
+      <div><table class="rt" id="wk-table"></table></div>
+      <div class="key">
+        <strong>Color key:</strong>
+        <span class="b bg">+5% or better</span>
+        <span class="b by">-3% to +5%</span>
+        <span class="b br">worse than -3%</span>
+        <span class="bn">— = no prior year data</span>
+      </div>
+      <div class="moving-avg-explainer" style="margin-top:14px;background:#eef5e8;border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:14px 16px;font-size:12px;color:var(--g600);line-height:1.65">
+        <strong style="color:var(--navy);font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.4px">📊 What is the 12-Month Moving Average?</strong><br>
+        The 12-month moving average is the average of the last 12 months' weekly averages, rolled forward each week.
+        Think of it as a "smoothed trend line" — it removes the noise from individual up or down weeks (holidays, bad weather, special events)
+        and shows you the true underlying direction of attendance over the past year.
+        <strong>If the moving average is rising, the church is growing. If it's falling, attendance is trending down — regardless of what any single week shows.</strong>
+        The "Moving Avg Change" column compares this year's 12-month average to last year's, giving you a clean long-term health indicator.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MONTHLY ══ -->
+<div id="page-monthly" class="page">
+  <div class="card">
+    <div class="ch">
+      <h2>Monthly Attendance Report</h2>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="ctrl"><label>Month:</label><input type="month" id="mo-month" onchange="renderMonthly()"></div>
+        <button class="btn bp bs no-print" onclick="printMonthly()">🖨 Print / Save PDF</button>
+      </div>
+    </div>
+    <div class="cb">
+      <div class="print-header">
+        <h2>Bent Tree Church — Monthly Attendance Report</h2>
+        <p id="print-mo-date"></p>
+      </div>
+      <div style="overflow-x:auto"><table class="rt" id="mo-table"></table></div>
+      <div class="key">
+        <strong>Color key:</strong>
+        <span class="b bg">+5% or better</span>
+        <span class="b by">-3% to +5%</span>
+        <span class="b br">worse than -3%</span>
+        Monthly averages exclude Together Sunday weeks. MSM/HSM averaged only over weeks they met.
+      </div>
+      <div class="moving-avg-explainer" style="margin-top:14px;background:#eef5e8;border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:14px 16px;font-size:12px;color:var(--g600);line-height:1.65">
+        <strong style="color:var(--navy);font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.4px">📊 What is the 12-Month Moving Average?</strong><br>
+        The 12-month moving average is the average of the last 12 months' weekly averages, updated each month.
+        It smooths out short-term swings from holidays, special events, or unusual weeks, revealing the true long-term attendance trend.
+        <strong>Rising = the church is growing. Falling = attendance is declining — independent of what any one week or month shows.</strong>
+        The "Moving Avg Change" column compares this year's 12-month average to the same point last year, so you can see whether the long-term trend is improving or worsening year over year.
+      </div>
+      <div style="height:20px"></div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:15px;color:var(--navy);margin-bottom:12px">13-Month Trend</h3>
+      <div style="overflow-x:auto"><table class="rt" id="trend-table"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SERVICE BREAKDOWN ══ -->
+<div id="page-service" class="page">
+  <div class="card">
+    <div class="ch">
+      <h2>Service Breakdown</h2>
+      <div class="ctrl"><label>Sunday:</label><input type="date" id="svc-date" onchange="renderService()"></div>
+    </div>
+    <div class="cb">
+      <div id="svc-content"></div>
+      <div style="height:24px"></div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:15px;color:var(--navy);margin-bottom:12px">Monthly Service-Time Averages — Last 13 Months</h3>
+      <div style="overflow-x:auto"><table class="rt" id="svc-trend"></table></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ENTRY ══ -->
+<div id="page-entry" class="page">
+  <div style="display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:start">
+  <div class="card" style="margin-bottom:0">
+    <div class="ch"><h2>Enter This Week's Data</h2></div>
+    <div class="cb">
+      <div class="fg">
+        <div class="fl ff"><label>Service Date</label><input type="date" id="e-date" onchange="onEntryDate()"></div>
+        <div id="e-exists" class="notice notice-warn ff" style="margin-bottom:0"></div>
+
+        <div class="st">Carrollton — Main Worship (Adults)</div>
+        <div class="fl"><label>1st Service</label><input type="number" id="e-a1" min="0" placeholder="0" oninput="livePreview()"></div>
+        <div class="fl"><label>2nd Service</label><input type="number" id="e-a2" min="0" placeholder="0" oninput="livePreview()"></div>
+        <div class="fl"><label>3rd Service (if added)</label><input type="number" id="e-a3" min="0" placeholder="0" oninput="livePreview()"></div>
+
+        <div class="st">Carrollton — Kids Ministry</div>
+        <div class="fl"><label>1st Service</label><input type="number" id="e-k1" min="0" placeholder="0" oninput="livePreview()"></div>
+        <div class="fl"><label>2nd Service</label><input type="number" id="e-k2" min="0" placeholder="0" oninput="livePreview()"></div>
+        <div class="fl"><label>3rd Service (if added)</label><input type="number" id="e-k3" min="0" placeholder="0" oninput="livePreview()"></div>
+
+        <div class="st">Student Ministries</div>
+        <div class="fl"><label>Middle School (MSM)</label><input type="number" id="e-msm" min="0" placeholder="0" oninput="livePreview()"></div>
+        <div class="fl"><label>High School (HSM)</label><input type="number" id="e-hsm" min="0" placeholder="0" oninput="livePreview()"></div>
+
+        <div class="st">BT Online</div>
+        <div class="fl"><label>Online Viewers</label><input type="number" id="e-online" min="0" placeholder="0" oninput="livePreview()"></div>
+
+        <div class="st">Additional Info</div>
+        <div class="fl">
+          <label>Holiday</label>
+          <select id="e-hol" onchange="livePreview()">
+            <option value="">— Normal Sunday —</option>
+            <option>Easter</option><option>Good Friday</option>
+            <option>Christmas Eve</option><option>Christmas</option>
+            <option>Memorial Day</option><option>Thanksgiving Sunday</option>
+          </select>
+        </div>
+        <div class="fl">
+          <label>Together Sunday?</label>
+          <select id="e-tog" onchange="livePreview()">
+            <option value="">No</option>
+            <option value="Together Sunday">Yes</option>
+          </select>
+        </div>
+        <div class="fl ff"><label>Notes</label><input type="text" id="e-notes" placeholder="e.g. United Weekend, HSM retreat…"></div>
+        <div class="fa">
+          <button class="btn bp" onclick="saveEntry()">Save Entry</button>
+          <button class="btn bs" style="background:var(--g100);color:var(--g600)" onclick="clearEntry()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="ch"><h2>Entry Preview</h2></div>
+    <div class="cb" id="e-preview"><p style="color:var(--g400);font-size:13px">Enter a date and numbers to see a preview.</p></div>
+  </div>
+  </div>
+</div>
+
+<!-- ══ HISTORY ══ -->
+<div id="page-history" class="page">
+  <div class="card">
+    <div class="ch">
+      <h2>Data History</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="h-search" placeholder="Search…" oninput="renderHistory()" style="border:1.5px solid var(--g200);border-radius:6px;padding:5px 9px;font-size:13px;width:180px;font-family:inherit">
+        <select id="h-year" onchange="renderHistory()" style="border:1.5px solid var(--g200);border-radius:6px;padding:5px 9px;font-size:13px;font-family:inherit;background:#fff">
+          <option value="">All years</option>
+        </select>
+      </div>
+    </div>
+    <div class="cb" style="padding:0">
+      <div style="overflow-x:auto;max-height:640px;overflow-y:auto">
+        <table class="ht2" id="h-table"></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS / DATA ══ -->
+<div id="page-settings" class="page">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+  <div class="card" style="margin-bottom:0">
+    <div class="ch"><h2>Export Data</h2></div>
+    <div class="cb">
+      <p style="font-size:13px;color:var(--g600);margin-bottom:14px">Download all attendance data as a JSON file. Share with other staff members so they can import it and have the same data.</p>
+      <button class="btn bp" onclick="exportData()">⬇ Download Data File</button>
+      <p style="font-size:11px;color:var(--g400);margin-top:10px">File includes all historical records plus any entries you've added in this browser.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:0">
+    <div class="ch"><h2>Import Data</h2></div>
+    <div class="cb">
+      <p style="font-size:13px;color:var(--g600);margin-bottom:14px">Import a data file exported from another device. New records will be merged in; existing records are updated if the date matches.</p>
+      <label class="btn bp" style="cursor:pointer">⬆ Choose File to Import<input type="file" accept=".json" onchange="importData(event)" style="display:none"></label>
+      <p style="font-size:11px;color:var(--g400);margin-top:10px">Only import files exported from this app. Your existing data is not deleted — records are merged by date.</p>
+    </div>
+  </div>
+  </div>
+  <div class="card">
+    <div class="ch"><h2>About</h2></div>
+    <div class="cb" style="font-size:13px;color:var(--g600);line-height:1.8">
+      <p><strong>Data storage:</strong> All data you enter is saved in your browser's local storage on this device. Use Export/Import to keep multiple devices in sync.</p>
+      <p style="margin-top:8px"><strong>Historical data:</strong> 738 records from January 2013 through April 2026 are built into the app.</p>
+      <p style="margin-top:8px"><strong>Hosting:</strong> This is a single HTML file. Host it free on GitHub Pages, Dropbox, or any web server. No backend required.</p>
+      <p style="margin-top:8px"><strong>Printing reports:</strong> Use the Print / Save PDF buttons to open the browser print dialog. Choose "Save as PDF" to create a file you can email to staff and elders.</p>
+    </div>
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════
+const SEED = [{"date": "2013-01-06", "a1": 1233, "a2": 1970, "a3": 0, "k1": 328, "k2": 280, "k3": 0, "msm": 0, "hsm": 140, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-09", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 195, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-16", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 180, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-20", "a1": 1356, "a2": 2004, "a3": 0, "k1": 392, "k2": 278, "k3": 0, "msm": 0, "hsm": 133, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-23", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 191, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-27", "a1": 1253, "a2": 2041, "a3": 0, "k1": 343, "k2": 310, "k3": 0, "msm": 0, "hsm": 151, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-01-30", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 205, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-03", "a1": 2291, "a2": 1705, "a3": 0, "k1": 402, "k2": 315, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Super Bowl; Point and Wildlife students in 9:00 service - Gary Pool Panel"}, {"date": "2013-02-06", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-10", "a1": 1214, "a2": 1706, "a3": 0, "k1": 356, "k2": 338, "k3": 0, "msm": 0, "hsm": 131, "online": 0, "holiday": "", "notes": "Gary Poole speaking"}, {"date": "2013-02-13", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-17", "a1": 1471, "a2": 1704, "a3": 0, "k1": 412, "k2": 296, "k3": 0, "msm": 0, "hsm": 125, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-20", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-24", "a1": 1313, "a2": 1800, "a3": 0, "k1": 394, "k2": 320, "k3": 0, "msm": 0, "hsm": 108, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-02-27", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-03-03", "a1": 1397, "a2": 1684, "a3": 0, "k1": 332, "k2": 309, "k3": 0, "msm": 0, "hsm": 124, "online": 0, "holiday": "", "notes": "Guest Speaker - Mike Licona"}, {"date": "2013-03-06", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 176, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-03-10", "a1": 697, "a2": 1928, "a3": 0, "k1": 68, "k2": 139, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Spring Break - Elementary in service - Daylight Savings"}, {"date": "2013-03-17", "a1": 1009, "a2": 1807, "a3": 0, "k1": 122, "k2": 119, "k3": 0, "msm": 0, "hsm": 112, "online": 0, "holiday": "", "notes": "Spring Break - Elementary in service - JoAnn Preaching"}, {"date": "2013-03-20", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 157, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-03-24", "a1": 1390, "a2": 2042, "a3": 0, "k1": 371, "k2": 341, "k3": 0, "msm": 0, "hsm": 124, "online": 0, "holiday": "", "notes": "Spring Break - Elementary in service"}, {"date": "2013-03-27", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 191, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-03-29", "a1": 1455, "a2": 922, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Good Friday", "notes": "Good Friday\nChild Visitors: 5:00 - 4; 7:00 - 1"}, {"date": "2013-03-31", "a1": 1288, "a2": 3449, "a3": 2872, "k1": 100, "k2": 257, "k3": 113, "msm": 0, "hsm": 0, "online": 0, "holiday": "Easter", "notes": "Easter\nChild Visitors: 8:00 - 4; 9:45 - 29; 11:30 - 15"}, {"date": "2013-04-03", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 211, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-04-07", "a1": 1480, "a2": 1873, "a3": 0, "k1": 383, "k2": 350, "k3": 0, "msm": 0, "hsm": 145, "online": 0, "holiday": "", "notes": "Dad's & Donuts - 37 dads"}, {"date": "2013-04-10", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 204, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-04-14", "a1": 1396, "a2": 1731, "a3": 0, "k1": 368, "k2": 298, "k3": 0, "msm": 0, "hsm": 131, "online": 0, "holiday": "", "notes": "Mom's & Muffins - 41 moms"}, {"date": "2013-04-17", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 190, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-04-21", "a1": 1563, "a2": 1801, "a3": 0, "k1": 402, "k2": 321, "k3": 0, "msm": 0, "hsm": 102, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-04-24", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 198, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-04-28", "a1": 1107, "a2": 1393, "a3": 0, "k1": 342, "k2": 289, "k3": 0, "msm": 0, "hsm": 127, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-01", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-05", "a1": 1291, "a2": 1659, "a3": 0, "k1": 355, "k2": 321, "k3": 0, "msm": 0, "hsm": 127, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-08", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-12", "a1": 1553, "a2": 1849, "a3": 0, "k1": 347, "k2": 285, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Mothers Day"}, {"date": "2013-05-15", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-19", "a1": 1160, "a2": 1759, "a3": 0, "k1": 349, "k2": 281, "k3": 0, "msm": 0, "hsm": 106, "online": 0, "holiday": "", "notes": "Senior Sunday\nFrisco - first town hall mtg at new location"}, {"date": "2013-05-22", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-05-26", "a1": 1311, "a2": 1724, "a3": 0, "k1": 150, "k2": 123, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Memorial Day Sunday", "notes": "Family Sunday"}, {"date": "2013-05-29", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-06-02", "a1": 1413, "a2": 1894, "a3": 0, "k1": 380, "k2": 338, "k3": 0, "msm": 0, "hsm": 145, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-06-09", "a1": 909, "a2": 1281, "a3": 0, "k1": 96, "k2": 96, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Scott Preaching/kids in service"}, {"date": "2013-06-16", "a1": 1014, "a2": 1521, "a3": 0, "k1": 109, "k2": 95, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Steve F preaching, kids in service/Fathers Day"}, {"date": "2013-06-23", "a1": 1262, "a2": 1893, "a3": 0, "k1": 137, "k2": 130, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching/kids in service/baby dedication"}, {"date": "2013-06-30", "a1": 1091, "a2": 1731, "a3": 0, "k1": 157, "k2": 119, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Steve F preaching, kids in service"}, {"date": "2013-07-07", "a1": 959, "a2": 1543, "a3": 0, "k1": 216, "k2": 204, "k3": 0, "msm": 0, "hsm": 125, "online": 0, "holiday": "", "notes": "JoAnn Preaching/Kids in Class"}, {"date": "2013-07-14", "a1": 935, "a2": 1459, "a3": 0, "k1": 198, "k2": 219, "k3": 0, "msm": 0, "hsm": 89, "online": 0, "holiday": "", "notes": "Scott Preaching/Kids in Class"}, {"date": "2013-07-21", "a1": 911, "a2": 1540, "a3": 0, "k1": 208, "k2": 247, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "JoAnn Preaching/kids in class"}, {"date": "2013-07-28", "a1": 997, "a2": 1776, "a3": 0, "k1": 197, "k2": 222, "k3": 0, "msm": 0, "hsm": 110, "online": 0, "holiday": "", "notes": "Steve F Preaching/Kids in Class"}, {"date": "2013-08-04", "a1": 1456, "a2": 2194, "a3": 0, "k1": 245, "k2": 283, "k3": 0, "msm": 0, "hsm": 141, "online": 0, "holiday": "", "notes": "Pete Back/Kids in Class/Marriage Series Begins"}, {"date": "2013-08-11", "a1": 1406, "a2": 2156, "a3": 0, "k1": 220, "k2": 259, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Back/Kids in Class/Marriage Series Begins"}, {"date": "2013-08-13", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-08-18", "a1": 1383, "a2": 2092, "a3": 0, "k1": 305, "k2": 306, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Back/Kids in Class/Marriage Series Begins"}, {"date": "2013-08-25", "a1": 1452, "a2": 2417, "a3": 0, "k1": 407, "k2": 422, "k3": 0, "msm": 264, "hsm": 165, "online": 0, "holiday": "", "notes": "Pete Preaching/Fall Session Begins\nMiddle School changed to Sunday nights"}, {"date": "2013-09-01", "a1": 996, "a2": 1530, "a3": 0, "k1": 141, "k2": 129, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Labor Day Sunday", "notes": "JoAnn Preaching/Kids in Church"}, {"date": "2013-09-08", "a1": 1295, "a2": 1665, "a3": 0, "k1": 348, "k2": 350, "k3": 0, "msm": 250, "hsm": 212, "online": 0, "holiday": "", "notes": "Steve F Preaching/Kids in Class"}, {"date": "2013-09-15", "a1": 1383, "a2": 1609, "a3": 0, "k1": 353, "k2": 301, "k3": 0, "msm": 259, "hsm": 200, "online": 0, "holiday": "", "notes": "Peter Preaching - Vision Sunday"}, {"date": "2013-09-22", "a1": 1216, "a2": 1662, "a3": 0, "k1": 348, "k2": 319, "k3": 0, "msm": 0, "hsm": 172, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2013-09-29", "a1": 1260, "a2": 1744, "a3": 0, "k1": 326, "k2": 302, "k3": 0, "msm": 203, "hsm": 170, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2013-10-06", "a1": 1223, "a2": 1632, "a3": 0, "k1": 362, "k2": 307, "k3": 0, "msm": 186, "hsm": 136, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-10-13", "a1": 1284, "a2": 1621, "a3": 0, "k1": 336, "k2": 311, "k3": 0, "msm": 201, "hsm": 181, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-10-20", "a1": 1194, "a2": 1339, "a3": 0, "k1": 319, "k2": 289, "k3": 0, "msm": 179, "hsm": 170, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-10-27", "a1": 1186, "a2": 1490, "a3": 0, "k1": 318, "k2": 327, "k3": 0, "msm": 202, "hsm": 160, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-03", "a1": 1546, "a2": 1629, "a3": 0, "k1": 396, "k2": 287, "k3": 0, "msm": 190, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-04", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-07", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-10", "a1": 1385, "a2": 1450, "a3": 0, "k1": 379, "k2": 330, "k3": 0, "msm": 190, "hsm": 165, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-14", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-17", "a1": 1388, "a2": 1705, "a3": 0, "k1": 355, "k2": 289, "k3": 0, "msm": 185, "hsm": 161, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-21", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2013-11-24", "a1": 1076, "a2": 1572, "a3": 0, "k1": 151, "k2": 127, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Elementary in Service\nLatino Thanksgiving Meal"}, {"date": "2013-12-01", "a1": 935, "a2": 1473, "a3": 0, "k1": 140, "k2": 104, "k3": 0, "msm": 0, "hsm": 135, "online": 0, "holiday": "Thanksgiving Sunday", "notes": "Scott Preaching"}, {"date": "2013-12-08", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Cancelled due to weather"}, {"date": "2013-12-15", "a1": 2724, "a2": 2466, "a3": 0, "k1": 278, "k2": 229, "k3": 0, "msm": 81, "hsm": 160, "online": 0, "holiday": "", "notes": "Christmas Drama"}, {"date": "2013-12-22", "a1": 1483, "a2": 1867, "a3": 0, "k1": 147, "k2": 124, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Latino Concert and dinner\nKindergarten included this year"}, {"date": "2013-12-24", "a1": 3296, "a2": 2902, "a3": 0, "k1": 131, "k2": 73, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Christmas Eve", "notes": "Christmas Eve"}, {"date": "2013-12-29", "a1": 1038, "a2": 1400, "a3": 0, "k1": 106, "k2": 115, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Steve Preaching"}, {"date": "2014-01-05", "a1": 1189, "a2": 1927, "a3": 0, "k1": 315, "k2": 323, "k3": 0, "msm": 139, "hsm": 190, "online": 0, "holiday": "", "notes": "JoAnn Preaching"}, {"date": "2014-01-12", "a1": 1489, "a2": 2132, "a3": 0, "k1": 395, "k2": 317, "k3": 0, "msm": 182, "hsm": 175, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-01-19", "a1": 1328, "a2": 2114, "a3": 0, "k1": 381, "k2": 344, "k3": 0, "msm": 168, "hsm": 190, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-01-26", "a1": 1579, "a2": 2126, "a3": 0, "k1": 385, "k2": 335, "k3": 0, "msm": 192, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-02-02", "a1": 1231, "a2": 1984, "a3": 0, "k1": 415, "k2": 315, "k3": 0, "msm": 150, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching; Super Bowl"}, {"date": "2014-02-09", "a1": 1446, "a2": 1932, "a3": 0, "k1": 356, "k2": 309, "k3": 0, "msm": 187, "hsm": 145, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-02-16", "a1": 1334, "a2": 2061, "a3": 0, "k1": 319, "k2": 305, "k3": 0, "msm": 160, "hsm": 148, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-02-23", "a1": 1177, "a2": 1592, "a3": 0, "k1": 342, "k2": 295, "k3": 0, "msm": 166, "hsm": 156, "online": 0, "holiday": "", "notes": "Scott Preaching"}, {"date": "2014-03-02", "a1": 1710, "a2": 1300, "a3": 0, "k1": 320, "k2": 273, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching; United Weekend"}, {"date": "2014-03-09", "a1": 921, "a2": 1934, "a3": 0, "k1": 120, "k2": 163, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Spring Break - Elementary, Wildlife in service/Daylight Savings"}, {"date": "2014-03-16", "a1": 1071, "a2": 1673, "a3": 0, "k1": 150, "k2": 183, "k3": 0, "msm": 0, "hsm": 136, "online": 0, "holiday": "", "notes": "Spring Break/Elementary in Service"}, {"date": "2014-03-23", "a1": 1286, "a2": 1925, "a3": 0, "k1": 344, "k2": 351, "k3": 0, "msm": 165, "hsm": 133, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-03-30", "a1": 1386, "a2": 2009, "a3": 0, "k1": 376, "k2": 360, "k3": 0, "msm": 139, "hsm": 139, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-04-06", "a1": 913, "a2": 1362, "a3": 0, "k1": 266, "k2": 313, "k3": 0, "msm": 160, "hsm": 144, "online": 0, "holiday": "", "notes": "JoAnn Preaching"}, {"date": "2014-04-13", "a1": 1291, "a2": 1524, "a3": 0, "k1": 388, "k2": 298, "k3": 0, "msm": 150, "hsm": 135, "online": 0, "holiday": "", "notes": "Steve Preaching; Journey to the Cross"}, {"date": "2014-04-20", "a1": 1848, "a2": 3643, "a3": 2759, "k1": 99, "k2": 293, "k3": 142, "msm": 0, "hsm": 0, "online": 0, "holiday": "Easter", "notes": "Easter Sunday"}, {"date": "2014-04-27", "a1": 1158, "a2": 1777, "a3": 0, "k1": 357, "k2": 289, "k3": 0, "msm": 0, "hsm": 95, "online": 0, "holiday": "", "notes": "Student Mission to Pine Cove"}, {"date": "2014-05-04", "a1": 1218, "a2": 1624, "a3": 0, "k1": 340, "k2": 300, "k3": 0, "msm": 140, "hsm": 115, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-05-11", "a1": 1304, "a2": 1621, "a3": 0, "k1": 364, "k2": 271, "k3": 0, "msm": 115, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-05-18", "a1": 1395, "a2": 1830, "a3": 0, "k1": 369, "k2": 321, "k3": 0, "msm": 132, "hsm": 146, "online": 0, "holiday": "", "notes": "Senior Sunday\n"}, {"date": "2014-05-25", "a1": 1229, "a2": 1765, "a3": 0, "k1": 180, "k2": 153, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Memorial Day Sunday", "notes": "Family Sunday"}, {"date": "2014-06-01", "a1": 1419, "a2": 1843, "a3": 0, "k1": 326, "k2": 312, "k3": 0, "msm": 160, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-06-08", "a1": 993, "a2": 1625, "a3": 0, "k1": 134, "k2": 127, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Steve F Preaching; kids in service"}, {"date": "2014-06-15", "a1": 1065, "a2": 1410, "a3": 0, "k1": 151, "k2": 120, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Scott preaching, Kids in Service, Fathers Day"}, {"date": "2014-06-22", "a1": 1337, "a2": 1547, "a3": 0, "k1": 175, "k2": 142, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pet Preaching, Kids in service, Baby dedication"}, {"date": "2014-06-29", "a1": 1182, "a2": 1291, "a3": 0, "k1": 148, "k2": 129, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-07-06", "a1": 906, "a2": 1333, "a3": 0, "k1": 191, "k2": 189, "k3": 0, "msm": 85, "hsm": 0, "online": 0, "holiday": "", "notes": "JoAnn Preaching, Kids in Class"}, {"date": "2014-07-13", "a1": 1120, "a2": 1648, "a3": 0, "k1": 229, "k2": 199, "k3": 0, "msm": 112, "hsm": 82, "online": 0, "holiday": "", "notes": "Adrew Farley Preaching"}, {"date": "2014-07-20", "a1": 989, "a2": 1501, "a3": 0, "k1": 212, "k2": 235, "k3": 0, "msm": 100, "hsm": 65, "online": 0, "holiday": "", "notes": "Mike daniels Preaching"}, {"date": "2014-07-27", "a1": 911, "a2": 1632, "a3": 0, "k1": 226, "k2": 270, "k3": 0, "msm": 90, "hsm": 95, "online": 0, "holiday": "", "notes": "Pet Preaching"}, {"date": "2014-08-03", "a1": 934, "a2": 1542, "a3": 0, "k1": 210, "k2": 288, "k3": 0, "msm": 85, "hsm": 85, "online": 0, "holiday": "", "notes": "Scott Preaching; kids in service"}, {"date": "2014-08-10", "a1": 1300, "a2": 2009, "a3": 0, "k1": 132, "k2": 149, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-08-17", "a1": 1021, "a2": 1789, "a3": 0, "k1": 144, "k2": 115, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-08-24", "a1": 1216, "a2": 1975, "a3": 0, "k1": 335, "k2": 349, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-08-31", "a1": 1212, "a2": 1845, "a3": 0, "k1": 138, "k2": 148, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Labor Day Sunday", "notes": ""}, {"date": "2014-09-07", "a1": 1381, "a2": 2122, "a3": 0, "k1": 354, "k2": 390, "k3": 0, "msm": 230, "hsm": 191, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-09-14", "a1": 1449, "a2": 1744, "a3": 0, "k1": 364, "k2": 355, "k3": 0, "msm": 220, "hsm": 160, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-09-21", "a1": 1286, "a2": 1545, "a3": 0, "k1": 419, "k2": 434, "k3": 0, "msm": 220, "hsm": 149, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-09-28", "a1": 1265, "a2": 1549, "a3": 0, "k1": 326, "k2": 355, "k3": 0, "msm": 189, "hsm": 149, "online": 0, "holiday": "", "notes": ""}, {"date": "2014-10-05", "a1": 1159, "a2": 1490, "a3": 0, "k1": 313, "k2": 275, "k3": 0, "msm": 0, "hsm": 119, "online": 0, "holiday": "", "notes": "Pete Preaching; Hebrews Series Begins"}, {"date": "2014-10-12", "a1": 1103, "a2": 1442, "a3": 0, "k1": 258, "k2": 273, "k3": 0, "msm": 154, "hsm": 142, "online": 0, "holiday": "", "notes": "Pete Preaching: Mission Week Begins"}, {"date": "2014-10-19", "a1": 1180, "a2": 1520, "a3": 0, "k1": 290, "k2": 323, "k3": 0, "msm": 169, "hsm": 144, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-10-26", "a1": 1188, "a2": 1370, "a3": 0, "k1": 317, "k2": 299, "k3": 0, "msm": 209, "hsm": 145, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-11-02", "a1": 1378, "a2": 1340, "a3": 0, "k1": 374, "k2": 303, "k3": 0, "msm": 180, "hsm": 150, "online": 0, "holiday": "", "notes": "Cowboys game at noon"}, {"date": "2014-11-09", "a1": 1478, "a2": 1425, "a3": 0, "k1": 350, "k2": 311, "k3": 0, "msm": 165, "hsm": 135, "online": 0, "holiday": "", "notes": "Baptism - Cowboys at noon"}, {"date": "2014-11-16", "a1": 1124, "a2": 1452, "a3": 0, "k1": 287, "k2": 277, "k3": 0, "msm": 142, "hsm": 133, "online": 0, "holiday": "", "notes": "Cold & Rainy"}, {"date": "2014-11-23", "a1": 1475, "a2": 1790, "a3": 0, "k1": 161, "k2": 120, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Elementary in Service"}, {"date": "2014-11-30", "a1": 930, "a2": 1392, "a3": 0, "k1": 114, "k2": 118, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Thanksgiving Sunday", "notes": "Steve Preaching/Family Sunday"}, {"date": "2014-12-07", "a1": 1852, "a2": 2460, "a3": 0, "k1": 158, "k2": 164, "k3": 0, "msm": 0, "hsm": 105, "online": 0, "holiday": "", "notes": "Christmas Drama"}, {"date": "2014-12-14", "a1": 1181, "a2": 1556, "a3": 0, "k1": 238, "k2": 265, "k3": 0, "msm": 119, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-12-21", "a1": 1278, "a2": 1491, "a3": 0, "k1": 181, "k2": 223, "k3": 0, "msm": 95, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2014-12-24", "a1": 3065, "a2": 3055, "a3": 0, "k1": 64, "k2": 74, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "Christmas Eve", "notes": ""}, {"date": "2014-12-28", "a1": 1003, "a2": 1303, "a3": 0, "k1": 96, "k2": 105, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "JoAnn Preaching"}, {"date": "2015-01-04", "a1": 1237, "a2": 1788, "a3": 0, "k1": 264, "k2": 303, "k3": 0, "msm": 160, "hsm": 150, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-01-11", "a1": 1610, "a2": 1159, "a3": 0, "k1": 353, "k2": 277, "k3": 0, "msm": 174, "hsm": 109, "online": 0, "holiday": "", "notes": "Pete Preaching; Cowboys' playoff at noon"}, {"date": "2015-01-18", "a1": 1210, "a2": 1548, "a3": 0, "k1": 295, "k2": 316, "k3": 0, "msm": 184, "hsm": 156, "online": 0, "holiday": "", "notes": "JoAnn Preaching; Group Conect"}, {"date": "2015-01-25", "a1": 1350, "a2": 1549, "a3": 0, "k1": 295, "k2": 316, "k3": 0, "msm": 186, "hsm": 124, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-02-01", "a1": 1127, "a2": 1559, "a3": 0, "k1": 319, "k2": 327, "k3": 0, "msm": 180, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching; Superbowl"}, {"date": "2015-02-08", "a1": 962, "a2": 1245, "a3": 0, "k1": 273, "k2": 322, "k3": 0, "msm": 160, "hsm": 121, "online": 0, "holiday": "", "notes": "Scott Preaching (recap of series)"}, {"date": "2015-02-15", "a1": 1238, "a2": 1695, "a3": 0, "k1": 338, "k2": 335, "k3": 0, "msm": 180, "hsm": 119, "online": 0, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-02-22", "a1": 2847, "a2": 1385, "a3": 0, "k1": 339, "k2": 285, "k3": 0, "msm": 0, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete Preaching; MS & HS in 1st Service; United Weekend"}, {"date": "2015-03-01", "a1": 1039, "a2": 1535, "a3": 0, "k1": 262, "k2": 287, "k3": 0, "msm": 181, "hsm": 133, "online": 472, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-03-08", "a1": 761, "a2": 1671, "a3": 0, "k1": 99, "k2": 148, "k3": 0, "msm": 0, "hsm": 0, "online": 368, "holiday": "", "notes": "Pete Preaching; daylight savings/Spring Break"}, {"date": "2015-03-15", "a1": 1033, "a2": 1405, "a3": 0, "k1": 116, "k2": 148, "k3": 0, "msm": 0, "hsm": 0, "online": 323, "holiday": "", "notes": "JoAnn preaching/Family Sunday"}, {"date": "2015-03-22", "a1": 1208, "a2": 1637, "a3": 0, "k1": 316, "k2": 365, "k3": 0, "msm": 209, "hsm": 100, "online": 416, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-03-29", "a1": 1205, "a2": 1536, "a3": 0, "k1": 317, "k2": 358, "k3": 0, "msm": 193, "hsm": 112, "online": 432, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-04-03", "a1": 1748, "a2": 849, "a3": 0, "k1": 140, "k2": 11, "k3": 0, "msm": 0, "hsm": 0, "online": 244, "holiday": "Good Friday", "notes": ""}, {"date": "2015-04-05", "a1": 1177, "a2": 3225, "a3": 2453, "k1": 73, "k2": 301, "k3": 100, "msm": 0, "hsm": 0, "online": 732, "holiday": "Easter", "notes": ""}, {"date": "2015-04-12", "a1": 1170, "a2": 1487, "a3": 0, "k1": 315, "k2": 299, "k3": 0, "msm": 160, "hsm": 125, "online": 453, "holiday": "", "notes": ""}, {"date": "2015-04-19", "a1": 819, "a2": 1301, "a3": 0, "k1": 293, "k2": 355, "k3": 39, "msm": 176, "hsm": 112, "online": 317, "holiday": "", "notes": ""}, {"date": "2015-04-26", "a1": 1321, "a2": 1540, "a3": 0, "k1": 309, "k2": 362, "k3": 29, "msm": 180, "hsm": 110, "online": 397, "holiday": "", "notes": ""}, {"date": "2015-05-03", "a1": 1247, "a2": 1409, "a3": 0, "k1": 329, "k2": 303, "k3": 0, "msm": 158, "hsm": 105, "online": 537, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-05-10", "a1": 936, "a2": 1367, "a3": 0, "k1": 252, "k2": 296, "k3": 0, "msm": 112, "hsm": 0, "online": 428, "holiday": "", "notes": "Pete Preaching; Mothers Day; very stormy"}, {"date": "2015-05-17", "a1": 1110, "a2": 1929, "a3": 0, "k1": 302, "k2": 317, "k3": 0, "msm": 154, "hsm": 136, "online": 397, "holiday": "", "notes": "Pete Preaching; Senior Sunday"}, {"date": "2015-05-24", "a1": 910, "a2": 1574, "a3": 0, "k1": 139, "k2": 141, "k3": 0, "msm": 0, "hsm": 0, "online": 425, "holiday": "Memorial Day Sunday", "notes": "Pete Preaching; bad weather; Memorial Day Holiday"}, {"date": "2015-05-31", "a1": 1349, "a2": 1751, "a3": 0, "k1": 368, "k2": 384, "k3": 0, "msm": 196, "hsm": 0, "online": 390, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-06-07", "a1": 1397, "a2": 1672, "a3": 0, "k1": 168, "k2": 84, "k3": 0, "msm": 0, "hsm": 0, "online": 391, "holiday": "", "notes": "Pete Preaching; Kids in service"}, {"date": "2015-06-14", "a1": 1261, "a2": 1752, "a3": 0, "k1": 129, "k2": 148, "k3": 0, "msm": 0, "hsm": 0, "online": 385, "holiday": "", "notes": "Pete Preaching; Kids in service"}, {"date": "2015-06-21", "a1": 1247, "a2": 1580, "a3": 0, "k1": 170, "k2": 146, "k3": 0, "msm": 0, "hsm": 0, "online": 354, "holiday": "", "notes": "Pete Preaching; Kids in service"}, {"date": "2015-06-28", "a1": 1263, "a2": 1758, "a3": 0, "k1": 137, "k2": 138, "k3": 0, "msm": 0, "hsm": 0, "online": 417, "holiday": "", "notes": "Pete Preaching; Kids in service"}, {"date": "2015-07-05", "a1": 815, "a2": 1335, "a3": 0, "k1": 163, "k2": 185, "k3": 0, "msm": 80, "hsm": 0, "online": 292, "holiday": "", "notes": "Steve F Preaching; no count for Special Needs"}, {"date": "2015-07-12", "a1": 1047, "a2": 1339, "a3": 0, "k1": 263, "k2": 254, "k3": 0, "msm": 120, "hsm": 40, "online": 296, "holiday": "", "notes": "Steve F Preaching; freshmen only in HS"}, {"date": "2015-07-19", "a1": 911, "a2": 1500, "a3": 0, "k1": 212, "k2": 235, "k3": 0, "msm": 75, "hsm": 90, "online": 308, "holiday": "", "notes": "JoAnn Preaching"}, {"date": "2015-07-26", "a1": 995, "a2": 1446, "a3": 0, "k1": 245, "k2": 267, "k3": 0, "msm": 85, "hsm": 65, "online": 348, "holiday": "", "notes": "Mike Daniels Preaching"}, {"date": "2015-08-02", "a1": 1025, "a2": 1486, "a3": 0, "k1": 210, "k2": 288, "k3": 0, "msm": 86, "hsm": 101, "online": 329, "holiday": "", "notes": "Andrew Farley preaching"}, {"date": "2015-08-09", "a1": 1333, "a2": 1680, "a3": 0, "k1": 251, "k2": 286, "k3": 0, "msm": 0, "hsm": 91, "online": 435, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-08-16", "a1": 1242, "a2": 1753, "a3": 0, "k1": 248, "k2": 281, "k3": 0, "msm": 0, "hsm": 0, "online": 446, "holiday": "", "notes": "Pete Preaching; HS offsite event"}, {"date": "2015-08-23", "a1": 1410, "a2": 1904, "a3": 0, "k1": 264, "k2": 373, "k3": 0, "msm": 186, "hsm": 141, "online": 503, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-08-30", "a1": 1312, "a2": 1748, "a3": 0, "k1": 287, "k2": 358, "k3": 0, "msm": 230, "hsm": 178, "online": 418, "holiday": "", "notes": ""}, {"date": "2015-09-06", "a1": 966, "a2": 1463, "a3": 0, "k1": 214, "k2": 292, "k3": 0, "msm": 0, "hsm": 0, "online": 467, "holiday": "Labor Day Sunday", "notes": "MS; HS did not meet"}, {"date": "2015-09-13", "a1": 1286, "a2": 1506, "a3": 0, "k1": 315, "k2": 299, "k3": 0, "msm": 210, "hsm": 129, "online": 527, "holiday": "", "notes": "Pete Preaching - Marriage Series"}, {"date": "2015-09-20", "a1": 1226, "a2": 1415, "a3": 0, "k1": 265, "k2": 292, "k3": 0, "msm": 177, "hsm": 128, "online": 463, "holiday": "", "notes": "Pete Preaching - Marriage Series"}, {"date": "2015-09-27", "a1": 1154, "a2": 1232, "a3": 0, "k1": 278, "k2": 326, "k3": 0, "msm": 180, "hsm": 126, "online": 537, "holiday": "", "notes": "Pete Preaching - Marriage Series"}, {"date": "2015-10-04", "a1": 1112, "a2": 1820, "a3": 0, "k1": 240, "k2": 230, "k3": 0, "msm": 15, "hsm": 25, "online": 442, "holiday": "", "notes": "Pete Teaching"}, {"date": "2015-10-11", "a1": 1146, "a2": 1387, "a3": 0, "k1": 242, "k2": 305, "k3": 0, "msm": 162, "hsm": 85, "online": 481, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-10-18", "a1": 971, "a2": 1328, "a3": 0, "k1": 205, "k2": 287, "k3": 0, "msm": 176, "hsm": 91, "online": 476, "holiday": "", "notes": "Pete Preaching"}, {"date": "2015-10-25", "a1": 926, "a2": 1309, "a3": 0, "k1": 198, "k2": 259, "k3": 0, "msm": 0, "hsm": 141, "online": 459, "holiday": "", "notes": "Scott Preaching; Middle School at Pine Cove, FX over for Fall"}, {"date": "2015-11-01", "a1": 1267, "a2": 1445, "a3": 0, "k1": 279, "k2": 331, "k3": 0, "msm": 189, "hsm": 112, "online": 491, "holiday": "", "notes": ""}, {"date": "2015-11-08", "a1": 1276, "a2": 1342, "a3": 0, "k1": 233, "k2": 290, "k3": 0, "msm": 162, "hsm": 110, "online": 475, "holiday": "", "notes": ""}, {"date": "2015-11-15", "a1": 899, "a2": 1260, "a3": 0, "k1": 244, "k2": 251, "k3": 0, "msm": 165, "hsm": 140, "online": 494, "holiday": "", "notes": ""}, {"date": "2015-11-22", "a1": 1058, "a2": 1148, "a3": 0, "k1": 224, "k2": 280, "k3": 0, "msm": 126, "hsm": 0, "online": 461, "holiday": "", "notes": ""}, {"date": "2015-11-29", "a1": 893, "a2": 1323, "a3": 0, "k1": 89, "k2": 83, "k3": 0, "msm": 0, "hsm": 0, "online": 525, "holiday": "Thanksgiving Sunday", "notes": "Family Sunday; no Middle School or High school"}, {"date": "2015-12-06", "a1": 1112, "a2": 1370, "a3": 0, "k1": 256, "k2": 293, "k3": 0, "msm": 190, "hsm": 95, "online": 516, "holiday": "", "notes": ""}, {"date": "2015-12-13", "a1": 0, "a2": 0, "a3": 0, "k1": 177, "k2": 223, "k3": 0, "msm": 51, "hsm": 83, "online": 508, "holiday": "", "notes": "Christmas Drama, Unable to count Adults due to technical difficulties "}, {"date": "2015-12-20", "a1": 0, "a2": 0, "a3": 0, "k1": 192, "k2": 282, "k3": 0, "msm": 0, "hsm": 0, "online": 446, "holiday": "Christmas Sunday", "notes": "Adults not recorded due to technical difficulties, Middle and High School not reported"}, {"date": "2015-12-24", "a1": 2937, "a2": 2555, "a3": 0, "k1": 98, "k2": 176, "k3": 0, "msm": 0, "hsm": 0, "online": 173, "holiday": "Christmas Eve", "notes": ""}, {"date": "2015-12-27", "a1": 565, "a2": 1139, "a3": 0, "k1": 82, "k2": 83, "k3": 0, "msm": 0, "hsm": 0, "online": 502, "holiday": "", "notes": "Frisco joined Carrollton for this Sunday; Family Sunday, No Middle or High School"}, {"date": "2016-01-03", "a1": 1211, "a2": 1643, "a3": 0, "k1": 310, "k2": 271, "k3": 0, "msm": 0, "hsm": 0, "online": 604, "holiday": "", "notes": ""}, {"date": "2016-01-10", "a1": 1325, "a2": 1777, "a3": 0, "k1": 298, "k2": 344, "k3": 0, "msm": 194, "hsm": 102, "online": 778, "holiday": "", "notes": ""}, {"date": "2016-01-17", "a1": 1348, "a2": 1655, "a3": 0, "k1": 258, "k2": 285, "k3": 0, "msm": 162, "hsm": 93, "online": 568, "holiday": "", "notes": ""}, {"date": "2016-01-24", "a1": 1172, "a2": 1652, "a3": 0, "k1": 265, "k2": 179, "k3": 0, "msm": 191, "hsm": 105, "online": 648, "holiday": "", "notes": ""}, {"date": "2016-01-31", "a1": 1218, "a2": 1533, "a3": 0, "k1": 276, "k2": 286, "k3": 0, "msm": 154, "hsm": 0, "online": 0, "holiday": "", "notes": "HSM had an offsite event. No attendance taken."}, {"date": "2016-02-07", "a1": 1187, "a2": 1382, "a3": 0, "k1": 250, "k2": 295, "k3": 0, "msm": 180, "hsm": 0, "online": 599, "holiday": "", "notes": "HSM did not meet per Super Bowl"}, {"date": "2016-02-14", "a1": 1193, "a2": 1407, "a3": 0, "k1": 252, "k2": 309, "k3": 0, "msm": 148, "hsm": 85, "online": 561, "holiday": "", "notes": ""}, {"date": "2016-02-21", "a1": 1735, "a2": 1232, "a3": 0, "k1": 299, "k2": 299, "k3": 0, "msm": 0, "hsm": 0, "online": 605, "holiday": "", "notes": "United Weekend HSM and MSM students in first service. "}, {"date": "2016-02-28", "a1": 1181, "a2": 1419, "a3": 0, "k1": 280, "k2": 324, "k3": 0, "msm": 156, "hsm": 74, "online": 589, "holiday": "", "notes": ""}, {"date": "2016-03-06", "a1": 1164, "a2": 1152, "a3": 0, "k1": 234, "k2": 249, "k3": 0, "msm": 93, "hsm": 0, "online": 555, "holiday": "", "notes": "HSM did not meet due to Spring Break"}, {"date": "2016-03-13", "a1": 685, "a2": 1197, "a3": 0, "k1": 173, "k2": 256, "k3": 0, "msm": 109, "hsm": 0, "online": 0, "holiday": "", "notes": "Pete not preaching, time change and spring break. HSM did not meet. "}, {"date": "2016-03-20", "a1": 933, "a2": 1329, "a3": 0, "k1": 241, "k2": 315, "k3": 0, "msm": 149, "hsm": 130, "online": 412, "holiday": "", "notes": ""}, {"date": "2016-03-25", "a1": 1450, "a2": 1150, "a3": 0, "k1": 80, "k2": 59, "k3": 0, "msm": 0, "hsm": 0, "online": 203, "holiday": "Good Friday", "notes": "Numbers are an estimate as cameras did not scan. "}, {"date": "2016-03-27", "a1": 960, "a2": 3038, "a3": 2366, "k1": 64, "k2": 253, "k3": 126, "msm": 0, "hsm": 0, "online": 640, "holiday": "Easter", "notes": ""}, {"date": "2016-04-03", "a1": 1094, "a2": 1413, "a3": 0, "k1": 271, "k2": 286, "k3": 0, "msm": 147, "hsm": 80, "online": 563, "holiday": "", "notes": "Sunday after Easter. "}, {"date": "2016-04-10", "a1": 843, "a2": 1108, "a3": 0, "k1": 218, "k2": 326, "k3": 0, "msm": 157, "hsm": 77, "online": 482, "holiday": "", "notes": ""}, {"date": "2016-04-17", "a1": 858, "a2": 738, "a3": 0, "k1": 242, "k2": 216, "k3": 0, "msm": 135, "hsm": 120, "online": 947, "holiday": "", "notes": "HSM is an estimate as they did not have small groups. "}, {"date": "2016-04-24", "a1": 1120, "a2": 1055, "a3": 0, "k1": 294, "k2": 296, "k3": 0, "msm": 154, "hsm": 91, "online": 473, "holiday": "", "notes": ""}, {"date": "2016-05-01", "a1": 1170, "a2": 1270, "a3": 0, "k1": 293, "k2": 323, "k3": 0, "msm": 164, "hsm": 80, "online": 469, "holiday": "", "notes": ""}, {"date": "2016-05-08", "a1": 1019, "a2": 1306, "a3": 0, "k1": 238, "k2": 267, "k3": 0, "msm": 87, "hsm": 0, "online": 373, "holiday": "", "notes": ""}, {"date": "2016-05-15", "a1": 969, "a2": 1303, "a3": 0, "k1": 281, "k2": 286, "k3": 0, "msm": 163, "hsm": 108, "online": 470, "holiday": "", "notes": ""}, {"date": "2016-05-22", "a1": 1126, "a2": 1313, "a3": 0, "k1": 276, "k2": 340, "k3": 0, "msm": 155, "hsm": 110, "online": 403, "holiday": "", "notes": ""}, {"date": "2016-05-29", "a1": 788, "a2": 1206, "a3": 0, "k1": 119, "k2": 133, "k3": 0, "msm": 0, "hsm": 0, "online": 435, "holiday": "Memorial Day Sunday", "notes": ""}, {"date": "2016-06-05", "a1": 1086, "a2": 1268, "a3": 0, "k1": 242, "k2": 250, "k3": 0, "msm": 154, "hsm": 0, "online": 483, "holiday": "", "notes": ""}, {"date": "2016-06-12", "a1": 974, "a2": 1273, "a3": 0, "k1": 215, "k2": 204, "k3": 0, "msm": 161, "hsm": 0, "online": 456, "holiday": "", "notes": ""}, {"date": "2016-06-19", "a1": 986, "a2": 1161, "a3": 0, "k1": 202, "k2": 185, "k3": 0, "msm": 165, "hsm": 0, "online": 221, "holiday": "", "notes": ""}, {"date": "2016-06-26", "a1": 875, "a2": 1253, "a3": 0, "k1": 176, "k2": 243, "k3": 0, "msm": 148, "hsm": 0, "online": 426, "holiday": "", "notes": "Last day of Spring Sermon Series"}, {"date": "2016-07-03", "a1": 692, "a2": 1011, "a3": 0, "k1": 69, "k2": 83, "k3": 0, "msm": 0, "hsm": 0, "online": 436, "holiday": "", "notes": "4th of July Weekend "}, {"date": "2016-07-10", "a1": 894, "a2": 1275, "a3": 0, "k1": 93, "k2": 104, "k3": 0, "msm": 0, "hsm": 50, "online": 485, "holiday": "", "notes": "No cont for online as Tim is out. "}, {"date": "2016-07-17", "a1": 860, "a2": 1234, "a3": 0, "k1": 96, "k2": 89, "k3": 0, "msm": 0, "hsm": 56, "online": 429, "holiday": "", "notes": ""}, {"date": "2016-07-24", "a1": 844, "a2": 1277, "a3": 0, "k1": 88, "k2": 97, "k3": 0, "msm": 0, "hsm": 94, "online": 418, "holiday": "", "notes": ""}, {"date": "2016-07-31", "a1": 824, "a2": 1264, "a3": 0, "k1": 86, "k2": 103, "k3": 0, "msm": 0, "hsm": 60, "online": 440, "holiday": "", "notes": ""}, {"date": "2016-08-07", "a1": 960, "a2": 1354, "a3": 0, "k1": 201, "k2": 265, "k3": 0, "msm": 152, "hsm": 82, "online": 466, "holiday": "", "notes": ""}, {"date": "2016-08-14", "a1": 1083, "a2": 1416, "a3": 0, "k1": 259, "k2": 257, "k3": 0, "msm": 153, "hsm": 90, "online": 497, "holiday": "", "notes": ""}, {"date": "2016-08-21", "a1": 1126, "a2": 1745, "a3": 0, "k1": 262, "k2": 388, "k3": 0, "msm": 175, "hsm": 135, "online": 541, "holiday": "", "notes": ""}, {"date": "2016-08-28", "a1": 1094, "a2": 1549, "a3": 0, "k1": 289, "k2": 387, "k3": 0, "msm": 181, "hsm": 150, "online": 539, "holiday": "", "notes": ""}, {"date": "2016-09-04", "a1": 829, "a2": 1256, "a3": 0, "k1": 111, "k2": 110, "k3": 0, "msm": 0, "hsm": 0, "online": 542, "holiday": "Labor Day Sunday", "notes": "FS Labor day weekend. "}, {"date": "2016-09-11", "a1": 1150, "a2": 1356, "a3": 0, "k1": 243, "k2": 362, "k3": 0, "msm": 244, "hsm": 159, "online": 483, "holiday": "", "notes": ""}, {"date": "2016-09-18", "a1": 993, "a2": 1073, "a3": 0, "k1": 262, "k2": 324, "k3": 0, "msm": 228, "hsm": 144, "online": 495, "holiday": "", "notes": ""}, {"date": "2016-09-25", "a1": 870, "a2": 971, "a3": 0, "k1": 254, "k2": 274, "k3": 0, "msm": 196, "hsm": 136, "online": 598, "holiday": "", "notes": ""}, {"date": "2016-10-02", "a1": 1005, "a2": 1271, "a3": 0, "k1": 263, "k2": 324, "k3": 0, "msm": 194, "hsm": 187, "online": 507, "holiday": "", "notes": "Issue with TT broadcast. "}, {"date": "2016-10-09", "a1": 918, "a2": 1042, "a3": 0, "k1": 220, "k2": 305, "k3": 0, "msm": 158, "hsm": 96, "online": 492, "holiday": "", "notes": ""}, {"date": "2016-10-16", "a1": 904, "a2": 1119, "a3": 0, "k1": 202, "k2": 286, "k3": 0, "msm": 162, "hsm": 107, "online": 506, "holiday": "", "notes": ""}, {"date": "2016-10-23", "a1": 852, "a2": 1115, "a3": 0, "k1": 227, "k2": 265, "k3": 0, "msm": 0, "hsm": 125, "online": 531, "holiday": "", "notes": ""}, {"date": "2016-10-30", "a1": 892, "a2": 1190, "a3": 0, "k1": 215, "k2": 287, "k3": 0, "msm": 200, "hsm": 150, "online": 588, "holiday": "", "notes": ""}, {"date": "2016-11-06", "a1": 1141, "a2": 1175, "a3": 0, "k1": 324, "k2": 285, "k3": 0, "msm": 157, "hsm": 127, "online": 611, "holiday": "", "notes": ""}, {"date": "2016-11-13", "a1": 1022, "a2": 1207, "a3": 0, "k1": 232, "k2": 277, "k3": 0, "msm": 146, "hsm": 145, "online": 589, "holiday": "", "notes": ""}, {"date": "2016-11-20", "a1": 1029, "a2": 1094, "a3": 0, "k1": 208, "k2": 267, "k3": 0, "msm": 155, "hsm": 0, "online": 576, "holiday": "", "notes": ""}, {"date": "2016-11-27", "a1": 1030, "a2": 1349, "a3": 0, "k1": 87, "k2": 115, "k3": 0, "msm": 0, "hsm": 0, "online": 545, "holiday": "Thanksgiving Sunday", "notes": "Family Sunday"}, {"date": "2016-12-04", "a1": 960, "a2": 1248, "a3": 0, "k1": 255, "k2": 287, "k3": 0, "msm": 167, "hsm": 134, "online": 578, "holiday": "", "notes": ""}, {"date": "2016-12-11", "a1": 1481, "a2": 2260, "a3": 0, "k1": 176, "k2": 181, "k3": 0, "msm": 0, "hsm": 185, "online": 594, "holiday": "", "notes": "Christmas Drama. ESP and MSM in 2nd Service. "}, {"date": "2016-12-18", "a1": 712, "a2": 1083, "a3": 0, "k1": 134, "k2": 199, "k3": 0, "msm": 143, "hsm": 94, "online": 631, "holiday": "", "notes": ""}, {"date": "2016-12-24", "a1": 3072, "a2": 3123, "a3": 0, "k1": 132, "k2": 99, "k3": 0, "msm": 0, "hsm": 0, "online": 185, "holiday": "Christmas Eve", "notes": "Christmas Eve. Kids programming birth- kinder. No Frisco Service. "}, {"date": "2016-12-25", "a1": 862, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 72, "holiday": "Christmas", "notes": "Dave Preaching 1 Service at 4:30pm only Carrollton"}, {"date": "2017-01-01", "a1": 586, "a2": 901, "a3": 0, "k1": 64, "k2": 88, "k3": 0, "msm": 0, "hsm": 0, "online": 585, "holiday": "New Years Day", "notes": "Family Sunday"}, {"date": "2017-01-08", "a1": 1100, "a2": 1577, "a3": 0, "k1": 266, "k2": 324, "k3": 0, "msm": 183, "hsm": 153, "online": 649, "holiday": "", "notes": ""}, {"date": "2017-01-15", "a1": 1002, "a2": 1450, "a3": 0, "k1": 116, "k2": 341, "k3": 0, "msm": 140, "hsm": 106, "online": 637, "holiday": "", "notes": ""}, {"date": "2017-01-22", "a1": 1054, "a2": 1479, "a3": 0, "k1": 257, "k2": 351, "k3": 0, "msm": 183, "hsm": 132, "online": 635, "holiday": "", "notes": ""}, {"date": "2017-01-29", "a1": 1053, "a2": 1384, "a3": 0, "k1": 220, "k2": 342, "k3": 0, "msm": 176, "hsm": 141, "online": 636, "holiday": "", "notes": ""}, {"date": "2017-02-05", "a1": 1031, "a2": 1258, "a3": 0, "k1": 262, "k2": 290, "k3": 0, "msm": 178, "hsm": 145, "online": 675, "holiday": "", "notes": ""}, {"date": "2017-02-12", "a1": 1009, "a2": 1373, "a3": 0, "k1": 223, "k2": 325, "k3": 0, "msm": 160, "hsm": 70, "online": 695, "holiday": "", "notes": ""}, {"date": "2017-02-19", "a1": 1651, "a2": 946, "a3": 0, "k1": 272, "k2": 250, "k3": 0, "msm": 0, "hsm": 0, "online": 673, "holiday": "", "notes": "United Weekend Students in 1st Service"}, {"date": "2017-02-26", "a1": 1109, "a2": 1107, "a3": 0, "k1": 261, "k2": 287, "k3": 0, "msm": 200, "hsm": 147, "online": 648, "holiday": "", "notes": "MSM is an estimate as they had a Baptism event."}, {"date": "2017-03-05", "a1": 1033, "a2": 1249, "a3": 0, "k1": 233, "k2": 294, "k3": 0, "msm": 159, "hsm": 115, "online": 670, "holiday": "", "notes": ""}, {"date": "2017-03-12", "a1": 744, "a2": 1131, "a3": 0, "k1": 154, "k2": 260, "k3": 0, "msm": 163, "hsm": 0, "online": 672, "holiday": "", "notes": "DST End. "}, {"date": "2017-03-19", "a1": 924, "a2": 1192, "a3": 0, "k1": 192, "k2": 293, "k3": 0, "msm": 136, "hsm": 128, "online": 604, "holiday": "", "notes": ""}, {"date": "2017-03-26", "a1": 841, "a2": 1055, "a3": 0, "k1": 246, "k2": 293, "k3": 0, "msm": 166, "hsm": 130, "online": 627, "holiday": "", "notes": "Amy Preaching"}, {"date": "2017-04-02", "a1": 708, "a2": 960, "a3": 0, "k1": 192, "k2": 226, "k3": 0, "msm": 134, "hsm": 93, "online": 781, "holiday": "", "notes": ""}, {"date": "2017-04-09", "a1": 962, "a2": 1296, "a3": 0, "k1": 248, "k2": 316, "k3": 0, "msm": 155, "hsm": 135, "online": 607, "holiday": "", "notes": ""}, {"date": "2017-04-16", "a1": 1510, "a2": 2444, "a3": 2237, "k1": 87, "k2": 199, "k3": 124, "msm": 0, "hsm": 0, "online": 682, "holiday": "Easter", "notes": "5516 Went Through Jounery to the Cross."}, {"date": "2017-04-23", "a1": 918, "a2": 1189, "a3": 0, "k1": 223, "k2": 325, "k3": 0, "msm": 165, "hsm": 118, "online": 621, "holiday": "", "notes": ""}, {"date": "2017-04-30", "a1": 1004, "a2": 1239, "a3": 0, "k1": 212, "k2": 308, "k3": 0, "msm": 148, "hsm": 104, "online": 660, "holiday": "", "notes": ""}, {"date": "2017-05-07", "a1": 1041, "a2": 1146, "a3": 0, "k1": 252, "k2": 262, "k3": 0, "msm": 121, "hsm": 128, "online": 618, "holiday": "", "notes": ""}, {"date": "2017-05-14", "a1": 1052, "a2": 1222, "a3": 0, "k1": 230, "k2": 288, "k3": 0, "msm": 138, "hsm": 0, "online": 524, "holiday": "", "notes": ""}, {"date": "2017-05-21", "a1": 1002, "a2": 1361, "a3": 0, "k1": 209, "k2": 365, "k3": 0, "msm": 159, "hsm": 134, "online": 569, "holiday": "", "notes": ""}, {"date": "2017-05-28", "a1": 823, "a2": 1063, "a3": 0, "k1": 105, "k2": 112, "k3": 0, "msm": 0, "hsm": 0, "online": 555, "holiday": "Memorial Day Sunday", "notes": "Facebook 761"}, {"date": "2017-06-04", "a1": 1033, "a2": 1312, "a3": 0, "k1": 199, "k2": 279, "k3": 0, "msm": 180, "hsm": 0, "online": 536, "holiday": "", "notes": ""}, {"date": "2017-06-11", "a1": 881, "a2": 1153, "a3": 0, "k1": 154, "k2": 244, "k3": 0, "msm": 140, "hsm": 0, "online": 561, "holiday": "", "notes": ""}, {"date": "2017-06-18", "a1": 957, "a2": 1119, "a3": 0, "k1": 190, "k2": 203, "k3": 0, "msm": 140, "hsm": 0, "online": 510, "holiday": "", "notes": "Facebook 639"}, {"date": "2017-06-25", "a1": 946, "a2": 1199, "a3": 0, "k1": 200, "k2": 267, "k3": 0, "msm": 170, "hsm": 0, "online": 554, "holiday": "", "notes": "FB -452, 338"}, {"date": "2017-07-02", "a1": 808, "a2": 1181, "a3": 0, "k1": 68, "k2": 85, "k3": 0, "msm": 0, "hsm": 0, "online": 485, "holiday": "", "notes": "Facebook 371 and 270 = 641"}, {"date": "2017-07-09", "a1": 1063, "a2": 1390, "a3": 0, "k1": 93, "k2": 94, "k3": 0, "msm": 0, "hsm": 125, "online": 559, "holiday": "", "notes": "FB 485+391=876"}, {"date": "2017-07-16", "a1": 1043, "a2": 1271, "a3": 0, "k1": 109, "k2": 106, "k3": 0, "msm": 0, "hsm": 95, "online": 571, "holiday": "", "notes": "FB 520+412=932"}, {"date": "2017-07-23", "a1": 1006, "a2": 1311, "a3": 0, "k1": 109, "k2": 93, "k3": 0, "msm": 0, "hsm": 95, "online": 567, "holiday": "", "notes": "FB-914"}, {"date": "2017-07-30", "a1": 974, "a2": 1255, "a3": 0, "k1": 97, "k2": 80, "k3": 0, "msm": 0, "hsm": 120, "online": 542, "holiday": "", "notes": "FB-718"}, {"date": "2017-08-06", "a1": 939, "a2": 1233, "a3": 0, "k1": 171, "k2": 284, "k3": 0, "msm": 145, "hsm": 0, "online": 583, "holiday": "", "notes": "FB 428+274. Last week before Pete Sabatical"}, {"date": "2017-08-13", "a1": 900, "a2": 1193, "a3": 0, "k1": 170, "k2": 284, "k3": 0, "msm": 148, "hsm": 0, "online": 519, "holiday": "", "notes": "FB 673 Ryan Lokkesmoe "}, {"date": "2017-08-20", "a1": 892, "a2": 1226, "a3": 0, "k1": 166, "k2": 291, "k3": 0, "msm": 165, "hsm": 0, "online": 483, "holiday": "", "notes": "FB- 470+299=769 Zach Lambert Preaching"}, {"date": "2017-08-27", "a1": 920, "a2": 1133, "a3": 0, "k1": 204, "k2": 278, "k3": 0, "msm": 208, "hsm": 235, "online": 535, "holiday": "", "notes": "FB- 436,247=683"}, {"date": "2017-09-03", "a1": 882, "a2": 1157, "a3": 0, "k1": 106, "k2": 84, "k3": 0, "msm": 0, "hsm": 0, "online": 517, "holiday": "Labor Day Sunday", "notes": "Facebook 726"}, {"date": "2017-09-10", "a1": 972, "a2": 1265, "a3": 0, "k1": 242, "k2": 334, "k3": 0, "msm": 230, "hsm": 189, "online": 490, "holiday": "", "notes": "Facebook 686"}, {"date": "2017-09-17", "a1": 912, "a2": 1206, "a3": 0, "k1": 221, "k2": 280, "k3": 0, "msm": 202, "hsm": 165, "online": 518, "holiday": "", "notes": "Steve Preaching FB = 810"}, {"date": "2017-09-24", "a1": 824, "a2": 1066, "a3": 0, "k1": 189, "k2": 267, "k3": 0, "msm": 193, "hsm": 132, "online": 487, "holiday": "", "notes": "FB 700"}, {"date": "2017-10-01", "a1": 927, "a2": 992, "a3": 0, "k1": 220, "k2": 219, "k3": 0, "msm": 193, "hsm": 0, "online": 552, "holiday": "", "notes": "FB 569 Missions Sunday"}, {"date": "2017-10-08", "a1": 847, "a2": 955, "a3": 0, "k1": 202, "k2": 231, "k3": 0, "msm": 170, "hsm": 165, "online": 561, "holiday": "", "notes": "FB 618 Mitch Preaching"}, {"date": "2017-10-15", "a1": 859, "a2": 1080, "a3": 0, "k1": 179, "k2": 267, "k3": 0, "msm": 203, "hsm": 160, "online": 570, "holiday": "", "notes": "FB =789. Scott Dyer "}, {"date": "2017-10-22", "a1": 768, "a2": 936, "a3": 0, "k1": 187, "k2": 209, "k3": 0, "msm": 0, "hsm": 155, "online": 513, "holiday": "", "notes": "JoAnn Preaching"}, {"date": "2017-10-29", "a1": 760, "a2": 1044, "a3": 0, "k1": 176, "k2": 255, "k3": 0, "msm": 163, "hsm": 150, "online": 525, "holiday": "", "notes": "Amy Preaching"}, {"date": "2017-11-05", "a1": 1010, "a2": 1096, "a3": 0, "k1": 260, "k2": 240, "k3": 0, "msm": 173, "hsm": 140, "online": 518, "holiday": "", "notes": "Steve Preaching. FB 724"}, {"date": "2017-11-12", "a1": 1139, "a2": 1421, "a3": 0, "k1": 248, "k2": 284, "k3": 0, "msm": 170, "hsm": 154, "online": 654, "holiday": "", "notes": "FB 971"}, {"date": "2017-11-19", "a1": 1116, "a2": 1358, "a3": 0, "k1": 226, "k2": 244, "k3": 0, "msm": 150, "hsm": 185, "online": 619, "holiday": "", "notes": "FB- 836"}, {"date": "2017-11-26", "a1": 1136, "a2": 1380, "a3": 0, "k1": 103, "k2": 82, "k3": 0, "msm": 0, "hsm": 0, "online": 654, "holiday": "Thanksgiving Sunday", "notes": "Facebook 854"}, {"date": "2017-12-03", "a1": 1032, "a2": 1287, "a3": 0, "k1": 239, "k2": 222, "k3": 0, "msm": 175, "hsm": 150, "online": 646, "holiday": "", "notes": "Facebook 823"}, {"date": "2017-12-10", "a1": 1610, "a2": 2063, "a3": 0, "k1": 180, "k2": 189, "k3": 0, "msm": 0, "hsm": 140, "online": 878, "holiday": "", "notes": "FB - 1400 Christmas Drama"}, {"date": "2017-12-17", "a1": 955, "a2": 1200, "a3": 0, "k1": 202, "k2": 234, "k3": 0, "msm": 150, "hsm": 150, "online": 643, "holiday": "", "notes": "Facebook-869"}, {"date": "2017-12-24", "a1": 2537, "a2": 1225, "a3": 2037, "k1": 124, "k2": 30, "k3": 50, "msm": 0, "hsm": 0, "online": 508, "holiday": "Christmas Eve", "notes": "FB -968"}, {"date": "2017-12-31", "a1": 606, "a2": 1098, "a3": 0, "k1": 57, "k2": 70, "k3": 0, "msm": 0, "hsm": 0, "online": 808, "holiday": "", "notes": "FB 1001"}, {"date": "2018-01-07", "a1": 1083, "a2": 1580, "a3": 0, "k1": 235, "k2": 308, "k3": 0, "msm": 196, "hsm": 185, "online": 772, "holiday": "", "notes": "FB-959"}, {"date": "2018-01-14", "a1": 1106, "a2": 1595, "a3": 0, "k1": 192, "k2": 316, "k3": 0, "msm": 181, "hsm": 150, "online": 799, "holiday": "", "notes": "FB=770"}, {"date": "2018-01-21", "a1": 1035, "a2": 1446, "a3": 0, "k1": 222, "k2": 317, "k3": 0, "msm": 212, "hsm": 202, "online": 2215, "holiday": "", "notes": ""}, {"date": "2018-01-28", "a1": 923, "a2": 1286, "a3": 0, "k1": 206, "k2": 271, "k3": 0, "msm": 185, "hsm": 205, "online": 1408, "holiday": "", "notes": "Estimated count. Cameras did not count. Kids were down 11% so reduced adults by 11% from last week. "}, {"date": "2018-02-04", "a1": 1005, "a2": 1292, "a3": 0, "k1": 217, "k2": 288, "k3": 0, "msm": 166, "hsm": 135, "online": 1981, "holiday": "", "notes": ""}, {"date": "2018-02-11", "a1": 901, "a2": 1140, "a3": 0, "k1": 186, "k2": 248, "k3": 0, "msm": 165, "hsm": 162, "online": 1811, "holiday": "", "notes": ""}, {"date": "2018-02-18", "a1": 1819, "a2": 1243, "a3": 0, "k1": 266, "k2": 244, "k3": 0, "msm": 0, "hsm": 0, "online": 1447, "holiday": "", "notes": "United Weekend Students in 1st Service"}, {"date": "2018-02-25", "a1": 1101, "a2": 1396, "a3": 0, "k1": 229, "k2": 309, "k3": 0, "msm": 190, "hsm": 174, "online": 1546, "holiday": "", "notes": ""}, {"date": "2018-03-04", "a1": 1133, "a2": 1352, "a3": 0, "k1": 265, "k2": 273, "k3": 0, "msm": 162, "hsm": 147, "online": 1489, "holiday": "", "notes": ""}, {"date": "2018-03-11", "a1": 721, "a2": 1242, "a3": 0, "k1": 84, "k2": 110, "k3": 0, "msm": 0, "hsm": 0, "online": 1999, "holiday": "", "notes": ""}, {"date": "2018-03-18", "a1": 818, "a2": 1280, "a3": 0, "k1": 191, "k2": 271, "k3": 0, "msm": 152, "hsm": 127, "online": 1502, "holiday": "", "notes": ""}, {"date": "2018-03-25", "a1": 976, "a2": 1181, "a3": 0, "k1": 235, "k2": 284, "k3": 0, "msm": 145, "hsm": 127, "online": 1486, "holiday": "", "notes": ""}, {"date": "2018-03-30", "a1": 871, "a2": 863, "a3": 0, "k1": 84, "k2": 54, "k3": 0, "msm": 0, "hsm": 0, "online": 991, "holiday": "Good Friday", "notes": "Good Friday 4 and 6pm"}, {"date": "2018-04-01", "a1": 988, "a2": 2811, "a3": 2199, "k1": 55, "k2": 220, "k3": 105, "msm": 0, "hsm": 0, "online": 2723, "holiday": "Easter", "notes": ""}, {"date": "2018-04-08", "a1": 1001, "a2": 1397, "a3": 0, "k1": 230, "k2": 317, "k3": 0, "msm": 166, "hsm": 165, "online": 1769, "holiday": "", "notes": ""}, {"date": "2018-04-15", "a1": 1040, "a2": 1435, "a3": 0, "k1": 243, "k2": 340, "k3": 0, "msm": 150, "hsm": 138, "online": 1811, "holiday": "", "notes": ""}, {"date": "2018-04-22", "a1": 1048, "a2": 1408, "a3": 0, "k1": 244, "k2": 334, "k3": 0, "msm": 147, "hsm": 127, "online": 2064, "holiday": "", "notes": ""}, {"date": "2018-04-29", "a1": 1100, "a2": 1228, "a3": 0, "k1": 246, "k2": 318, "k3": 0, "msm": 184, "hsm": 157, "online": 1413, "holiday": "", "notes": ""}, {"date": "2018-05-06", "a1": 952, "a2": 1155, "a3": 0, "k1": 234, "k2": 315, "k3": 0, "msm": 159, "hsm": 142, "online": 2228, "holiday": "", "notes": ""}, {"date": "2018-05-13", "a1": 1366, "a2": 1412, "a3": 0, "k1": 275, "k2": 264, "k3": 0, "msm": 114, "hsm": 0, "online": 1244, "holiday": "", "notes": "Senior Sunday"}, {"date": "2018-05-20", "a1": 896, "a2": 1140, "a3": 0, "k1": 205, "k2": 241, "k3": 0, "msm": 156, "hsm": 170, "online": 2198, "holiday": "", "notes": "New Collective Recording"}, {"date": "2018-05-27", "a1": 998, "a2": 1188, "a3": 0, "k1": 117, "k2": 105, "k3": 0, "msm": 0, "hsm": 0, "online": 1490, "holiday": "Memorial Day Sunday", "notes": ""}, {"date": "2018-06-03", "a1": 988, "a2": 1483, "a3": 0, "k1": 223, "k2": 280, "k3": 0, "msm": 183, "hsm": 0, "online": 1372, "holiday": "", "notes": ""}, {"date": "2018-06-10", "a1": 893, "a2": 1306, "a3": 0, "k1": 213, "k2": 263, "k3": 0, "msm": 120, "hsm": 0, "online": 1412, "holiday": "", "notes": ""}, {"date": "2018-06-17", "a1": 983, "a2": 1205, "a3": 0, "k1": 203, "k2": 217, "k3": 0, "msm": 98, "hsm": 0, "online": 1463, "holiday": "", "notes": ""}, {"date": "2018-06-24", "a1": 912, "a2": 1275, "a3": 0, "k1": 210, "k2": 247, "k3": 0, "msm": 153, "hsm": 0, "online": 1615, "holiday": "", "notes": ""}, {"date": "2018-07-01", "a1": 855, "a2": 1269, "a3": 0, "k1": 87, "k2": 89, "k3": 0, "msm": 0, "hsm": 90, "online": 1155, "holiday": "", "notes": ""}, {"date": "2018-07-08", "a1": 900, "a2": 1223, "a3": 0, "k1": 90, "k2": 84, "k3": 0, "msm": 0, "hsm": 110, "online": 1543, "holiday": "", "notes": ""}, {"date": "2018-07-15", "a1": 885, "a2": 1195, "a3": 0, "k1": 105, "k2": 74, "k3": 0, "msm": 0, "hsm": 110, "online": 2309, "holiday": "", "notes": ""}, {"date": "2018-07-22", "a1": 871, "a2": 1147, "a3": 0, "k1": 100, "k2": 79, "k3": 0, "msm": 0, "hsm": 108, "online": 1392, "holiday": "", "notes": ""}, {"date": "2018-07-29", "a1": 883, "a2": 1270, "a3": 0, "k1": 98, "k2": 94, "k3": 0, "msm": 0, "hsm": 137, "online": 1263, "holiday": "", "notes": ""}, {"date": "2018-08-05", "a1": 1049, "a2": 1486, "a3": 0, "k1": 184, "k2": 270, "k3": 0, "msm": 125, "hsm": 0, "online": 1827, "holiday": "", "notes": ""}, {"date": "2018-08-12", "a1": 1149, "a2": 1530, "a3": 0, "k1": 229, "k2": 305, "k3": 0, "msm": 165, "hsm": 0, "online": 2843, "holiday": "", "notes": ""}, {"date": "2018-08-19", "a1": 1055, "a2": 1523, "a3": 0, "k1": 245, "k2": 313, "k3": 0, "msm": 156, "hsm": 0, "online": 2513, "holiday": "", "notes": ""}, {"date": "2018-08-26", "a1": 1005, "a2": 1290, "a3": 0, "k1": 244, "k2": 299, "k3": 0, "msm": 188, "hsm": 280, "online": 2654, "holiday": "", "notes": ""}, {"date": "2018-09-02", "a1": 844, "a2": 1264, "a3": 0, "k1": 106, "k2": 104, "k3": 0, "msm": 0, "hsm": 0, "online": 1254, "holiday": "Labor Day Sunday", "notes": ""}, {"date": "2018-09-09", "a1": 935, "a2": 1394, "a3": 0, "k1": 207, "k2": 395, "k3": 0, "msm": 250, "hsm": 230, "online": 1267, "holiday": "", "notes": ""}, {"date": "2018-09-16", "a1": 871, "a2": 1252, "a3": 0, "k1": 232, "k2": 283, "k3": 0, "msm": 193, "hsm": 191, "online": 990, "holiday": "", "notes": ""}, {"date": "2018-09-23", "a1": 1022, "a2": 1404, "a3": 0, "k1": 248, "k2": 362, "k3": 0, "msm": 195, "hsm": 180, "online": 1256, "holiday": "", "notes": ""}, {"date": "2018-09-30", "a1": 1041, "a2": 1200, "a3": 0, "k1": 250, "k2": 296, "k3": 0, "msm": 180, "hsm": 152, "online": 1350, "holiday": "", "notes": ""}, {"date": "2018-10-07", "a1": 839, "a2": 1160, "a3": 0, "k1": 175, "k2": 275, "k3": 0, "msm": 160, "hsm": 165, "online": 1210, "holiday": "", "notes": ""}, {"date": "2018-10-14", "a1": 1094, "a2": 1349, "a3": 0, "k1": 270, "k2": 323, "k3": 0, "msm": 183, "hsm": 0, "online": 1244, "holiday": "", "notes": "Missions Sunday. Frisco in service"}, {"date": "2018-10-21", "a1": 886, "a2": 1080, "a3": 0, "k1": 225, "k2": 260, "k3": 0, "msm": 0, "hsm": 126, "online": 1340, "holiday": "", "notes": ""}, {"date": "2018-10-28", "a1": 875, "a2": 1138, "a3": 0, "k1": 191, "k2": 271, "k3": 0, "msm": 153, "hsm": 168, "online": 1326, "holiday": "", "notes": ""}, {"date": "2018-11-04", "a1": 1155, "a2": 1242, "a3": 0, "k1": 243, "k2": 287, "k3": 0, "msm": 185, "hsm": 143, "online": 1321, "holiday": "", "notes": ""}, {"date": "2018-11-11", "a1": 949, "a2": 1196, "a3": 0, "k1": 236, "k2": 245, "k3": 0, "msm": 140, "hsm": 165, "online": 1164, "holiday": "", "notes": ""}, {"date": "2018-11-18", "a1": 882, "a2": 1097, "a3": 0, "k1": 190, "k2": 237, "k3": 0, "msm": 127, "hsm": 165, "online": 1529, "holiday": "", "notes": ""}, {"date": "2018-11-25", "a1": 943, "a2": 1288, "a3": 0, "k1": 80, "k2": 111, "k3": 0, "msm": 0, "hsm": 0, "online": 1491, "holiday": "Thanksgiving Sunday", "notes": ""}, {"date": "2018-12-02", "a1": 958, "a2": 1152, "a3": 0, "k1": 190, "k2": 299, "k3": 0, "msm": 154, "hsm": 153, "online": 844, "holiday": "", "notes": ""}, {"date": "2018-12-09", "a1": 1228, "a2": 1639, "a3": 0, "k1": 171, "k2": 183, "k3": 0, "msm": 0, "hsm": 162, "online": 1387, "holiday": "", "notes": ""}, {"date": "2018-12-16", "a1": 929, "a2": 1081, "a3": 0, "k1": 194, "k2": 240, "k3": 0, "msm": 165, "hsm": 186, "online": 1329, "holiday": "", "notes": ""}, {"date": "2018-12-23", "a1": 1051, "a2": 1158, "a3": 0, "k1": 76, "k2": 68, "k3": 0, "msm": 0, "hsm": 0, "online": 1002, "holiday": "", "notes": ""}, {"date": "2018-12-24", "a1": 1923, "a2": 1689, "a3": 0, "k1": 58, "k2": 51, "k3": 0, "msm": 0, "hsm": 0, "online": 592, "holiday": "Christmas Eve", "notes": ""}, {"date": "2018-12-30", "a1": 667, "a2": 1032, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1251, "holiday": "", "notes": ""}, {"date": "2019-01-06", "a1": 936, "a2": 1309, "a3": 0, "k1": 198, "k2": 256, "k3": 0, "msm": 155, "hsm": 187, "online": 1492, "holiday": "", "notes": ""}, {"date": "2019-01-13", "a1": 860, "a2": 1262, "a3": 0, "k1": 197, "k2": 296, "k3": 0, "msm": 193, "hsm": 223, "online": 1502, "holiday": "", "notes": ""}, {"date": "2019-01-20", "a1": 799, "a2": 1148, "a3": 0, "k1": 191, "k2": 246, "k3": 0, "msm": 157, "hsm": 163, "online": 1497, "holiday": "", "notes": ""}, {"date": "2019-01-27", "a1": 899, "a2": 1250, "a3": 0, "k1": 208, "k2": 257, "k3": 0, "msm": 163, "hsm": 174, "online": 1269, "holiday": "", "notes": ""}, {"date": "2019-02-03", "a1": 855, "a2": 1067, "a3": 0, "k1": 184, "k2": 257, "k3": 0, "msm": 151, "hsm": 76, "online": 1417, "holiday": "", "notes": ""}, {"date": "2019-02-10", "a1": 828, "a2": 1109, "a3": 0, "k1": 180, "k2": 277, "k3": 0, "msm": 162, "hsm": 140, "online": 1417, "holiday": "", "notes": ""}, {"date": "2019-02-17", "a1": 1471, "a2": 1019, "a3": 0, "k1": 193, "k2": 217, "k3": 0, "msm": 0, "hsm": 0, "online": 1781, "holiday": "", "notes": ""}, {"date": "2019-02-24", "a1": 983, "a2": 1060, "a3": 0, "k1": 219, "k2": 253, "k3": 0, "msm": 165, "hsm": 145, "online": 1369, "holiday": "", "notes": ""}, {"date": "2019-03-03", "a1": 706, "a2": 1000, "a3": 0, "k1": 166, "k2": 241, "k3": 0, "msm": 156, "hsm": 170, "online": 1300, "holiday": "", "notes": ""}, {"date": "2019-03-10", "a1": 668, "a2": 1025, "a3": 0, "k1": 69, "k2": 84, "k3": 0, "msm": 0, "hsm": 0, "online": 1904, "holiday": "", "notes": ""}, {"date": "2019-03-17", "a1": 858, "a2": 1067, "a3": 0, "k1": 167, "k2": 234, "k3": 0, "msm": 142, "hsm": 135, "online": 1361, "holiday": "", "notes": ""}, {"date": "2019-03-24", "a1": 874, "a2": 1178, "a3": 0, "k1": 207, "k2": 263, "k3": 0, "msm": 147, "hsm": 133, "online": 1375, "holiday": "", "notes": ""}, {"date": "2019-03-31", "a1": 1971, "a2": 1728, "a3": 0, "k1": 373, "k2": 325, "k3": 0, "msm": 162, "hsm": 166, "online": 5023, "holiday": "Pete Announcement", "notes": ""}, {"date": "2019-04-07", "a1": 795, "a2": 980, "a3": 0, "k1": 176, "k2": 256, "k3": 0, "msm": 155, "hsm": 111, "online": 1782, "holiday": "", "notes": ""}, {"date": "2019-04-14", "a1": 791, "a2": 862, "a3": 0, "k1": 184, "k2": 252, "k3": 0, "msm": 146, "hsm": 167, "online": 1139, "holiday": "", "notes": ""}, {"date": "2019-04-19", "a1": 990, "a2": 522, "a3": 0, "k1": 86, "k2": 7, "k3": 0, "msm": 0, "hsm": 0, "online": 984, "holiday": "Good Friday", "notes": ""}, {"date": "2019-04-21", "a1": 2322, "a2": 2434, "a3": 0, "k1": 193, "k2": 144, "k3": 0, "msm": 0, "hsm": 0, "online": 1298, "holiday": "Easter", "notes": ""}, {"date": "2019-04-28", "a1": 812, "a2": 926, "a3": 0, "k1": 159, "k2": 229, "k3": 0, "msm": 124, "hsm": 170, "online": 1507, "holiday": "", "notes": ""}, {"date": "2019-05-05", "a1": 836, "a2": 952, "a3": 0, "k1": 181, "k2": 255, "k3": 0, "msm": 118, "hsm": 180, "online": 1134, "holiday": "", "notes": ""}, {"date": "2019-05-12", "a1": 1111, "a2": 1234, "a3": 0, "k1": 228, "k2": 240, "k3": 0, "msm": 106, "hsm": 0, "online": 892, "holiday": "", "notes": "FB Stream for 2nd Hour is MIA. "}, {"date": "2019-05-19", "a1": 766, "a2": 963, "a3": 0, "k1": 172, "k2": 266, "k3": 0, "msm": 178, "hsm": 180, "online": 1047, "holiday": "", "notes": ""}, {"date": "2019-05-26", "a1": 687, "a2": 969, "a3": 0, "k1": 81, "k2": 83, "k3": 0, "msm": 0, "hsm": 0, "online": 984, "holiday": "Memorial Day Sunday", "notes": ""}, {"date": "2019-06-02", "a1": 697, "a2": 937, "a3": 0, "k1": 136, "k2": 220, "k3": 0, "msm": 121, "hsm": 0, "online": 983, "holiday": "", "notes": ""}, {"date": "2019-06-09", "a1": 741, "a2": 914, "a3": 0, "k1": 137, "k2": 192, "k3": 0, "msm": 113, "hsm": 0, "online": 1022, "holiday": "", "notes": ""}, {"date": "2019-06-16", "a1": 712, "a2": 862, "a3": 0, "k1": 132, "k2": 157, "k3": 0, "msm": 83, "hsm": 0, "online": 862, "holiday": "", "notes": ""}, {"date": "2019-06-23", "a1": 724, "a2": 944, "a3": 0, "k1": 152, "k2": 183, "k3": 0, "msm": 115, "hsm": 0, "online": 1138, "holiday": "", "notes": "FB = 719 Youtube = 419"}, {"date": "2019-06-30", "a1": 708, "a2": 937, "a3": 0, "k1": 135, "k2": 183, "k3": 0, "msm": 101, "hsm": 0, "online": 985, "holiday": "", "notes": ""}, {"date": "2019-07-07", "a1": 679, "a2": 915, "a3": 0, "k1": 66, "k2": 65, "k3": 0, "msm": 0, "hsm": 113, "online": 1019, "holiday": "", "notes": "4th of July Weekend"}, {"date": "2019-07-14", "a1": 732, "a2": 1111, "a3": 0, "k1": 82, "k2": 63, "k3": 0, "msm": 0, "hsm": 100, "online": 990, "holiday": "", "notes": "545 FB 445 Stream"}, {"date": "2019-07-21", "a1": 688, "a2": 975, "a3": 0, "k1": 75, "k2": 60, "k3": 0, "msm": 0, "hsm": 110, "online": 840, "holiday": "", "notes": "Facebook: 272+193=465 YouTube: 241+134=375"}, {"date": "2019-07-28", "a1": 738, "a2": 943, "a3": 0, "k1": 60, "k2": 84, "k3": 0, "msm": 0, "hsm": 85, "online": 1187, "holiday": "", "notes": "FB - 550 Youtube - 637 (Stream issues)"}, {"date": "2019-08-04", "a1": 744, "a2": 1009, "a3": 0, "k1": 139, "k2": 205, "k3": 0, "msm": 155, "hsm": 0, "online": 962, "holiday": "", "notes": "FB- 519 Yt- 443"}, {"date": "2019-08-11", "a1": 771, "a2": 1064, "a3": 0, "k1": 156, "k2": 258, "k3": 0, "msm": 141, "hsm": 0, "online": 1085, "holiday": "", "notes": "fb- 437 yt- 648"}, {"date": "2019-08-18", "a1": 746, "a2": 1091, "a3": 0, "k1": 176, "k2": 239, "k3": 0, "msm": 205, "hsm": 250, "online": 958, "holiday": "", "notes": "FB- 489 YT-469"}, {"date": "2019-08-25", "a1": 717, "a2": 1046, "a3": 0, "k1": 157, "k2": 262, "k3": 0, "msm": 165, "hsm": 228, "online": 990, "holiday": "", "notes": "FB -531 YT - 459"}, {"date": "2019-09-01", "a1": 633, "a2": 915, "a3": 0, "k1": 70, "k2": 56, "k3": 0, "msm": 0, "hsm": 0, "online": 936, "holiday": "Labor Day Sunday", "notes": "FB-538 YT- 398"}, {"date": "2019-09-08", "a1": 839, "a2": 1053, "a3": 0, "k1": 166, "k2": 247, "k3": 0, "msm": 179, "hsm": 215, "online": 1212, "holiday": "", "notes": "687- FB 525- YT"}, {"date": "2019-09-15", "a1": 809, "a2": 839, "a3": 0, "k1": 166, "k2": 235, "k3": 0, "msm": 159, "hsm": 185, "online": 721, "holiday": "", "notes": "Cowboys played at noon. FB - 338 YT- 383"}, {"date": "2019-09-22", "a1": 700, "a2": 814, "a3": 0, "k1": 166, "k2": 229, "k3": 0, "msm": 144, "hsm": 183, "online": 783, "holiday": "", "notes": "Cowboys played at noon"}, {"date": "2019-09-29", "a1": 677, "a2": 844, "a3": 0, "k1": 170, "k2": 244, "k3": 0, "msm": 145, "hsm": 160, "online": 835, "holiday": "", "notes": "Missions Sunday. Frisco at Carrollton FB-392 YT-443"}, {"date": "2019-10-06", "a1": 741, "a2": 839, "a3": 0, "k1": 166, "k2": 220, "k3": 0, "msm": 148, "hsm": 168, "online": 805, "holiday": "", "notes": "Online FB-384 YT-421"}, {"date": "2019-10-13", "a1": 573, "a2": 733, "a3": 0, "k1": 126, "k2": 169, "k3": 0, "msm": 131, "hsm": 145, "online": 895, "holiday": "", "notes": "FB -405 YT-490"}, {"date": "2019-10-20", "a1": 604, "a2": 766, "a3": 0, "k1": 132, "k2": 168, "k3": 0, "msm": 0, "hsm": 146, "online": 1243, "holiday": "", "notes": ""}, {"date": "2019-10-27", "a1": 610, "a2": 763, "a3": 0, "k1": 116, "k2": 210, "k3": 0, "msm": 142, "hsm": 155, "online": 1080, "holiday": "", "notes": ""}, {"date": "2019-11-03", "a1": 724, "a2": 789, "a3": 0, "k1": 157, "k2": 187, "k3": 0, "msm": 128, "hsm": 125, "online": 795, "holiday": "", "notes": ""}, {"date": "2019-11-10", "a1": 710, "a2": 802, "a3": 0, "k1": 129, "k2": 196, "k3": 0, "msm": 139, "hsm": 150, "online": 814, "holiday": "", "notes": ""}, {"date": "2019-11-17", "a1": 718, "a2": 785, "a3": 0, "k1": 151, "k2": 184, "k3": 0, "msm": 145, "hsm": 145, "online": 819, "holiday": "", "notes": "Cowboys Noon Game"}, {"date": "2019-11-24", "a1": 1862, "a2": 0, "a3": 0, "k1": 52, "k2": 0, "k3": 0, "msm": 0, "hsm": 155, "online": 765, "holiday": "", "notes": "Harmony Sunday. 1 Service at 10 am. "}, {"date": "2019-12-01", "a1": 638, "a2": 817, "a3": 0, "k1": 114, "k2": 162, "k3": 0, "msm": 121, "hsm": 0, "online": 728, "holiday": "Thanksgiving Sunday", "notes": ""}, {"date": "2019-12-08", "a1": 963, "a2": 1381, "a3": 0, "k1": 107, "k2": 131, "k3": 0, "msm": 0, "hsm": 130, "online": 953, "holiday": "", "notes": ""}, {"date": "2019-12-15", "a1": 631, "a2": 818, "a3": 0, "k1": 99, "k2": 162, "k3": 0, "msm": 151, "hsm": 145, "online": 797, "holiday": "", "notes": ""}, {"date": "2019-12-22", "a1": 712, "a2": 989, "a3": 0, "k1": 43, "k2": 66, "k3": 0, "msm": 0, "hsm": 0, "online": 883, "holiday": "", "notes": ""}, {"date": "2019-12-24", "a1": 2057, "a2": 1473, "a3": 0, "k1": 66, "k2": 46, "k3": 0, "msm": 0, "hsm": 0, "online": 760, "holiday": "Christmas Eve", "notes": ""}, {"date": "2019-12-29", "a1": 591, "a2": 859, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1073, "holiday": "", "notes": ""}, {"date": "2020-01-05", "a1": 748, "a2": 1095, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1096, "holiday": "", "notes": "All In Family Sunday. Steve Preaching"}, {"date": "2020-01-12", "a1": 763, "a2": 987, "a3": 0, "k1": 148, "k2": 234, "k3": 0, "msm": 161, "hsm": 170, "online": 921, "holiday": "", "notes": ""}, {"date": "2020-01-19", "a1": 680, "a2": 997, "a3": 0, "k1": 149, "k2": 205, "k3": 0, "msm": 137, "hsm": 178, "online": 932, "holiday": "", "notes": ""}, {"date": "2020-01-26", "a1": 712, "a2": 916, "a3": 0, "k1": 143, "k2": 195, "k3": 0, "msm": 128, "hsm": 170, "online": 762, "holiday": "", "notes": ""}, {"date": "2020-02-02", "a1": 685, "a2": 811, "a3": 0, "k1": 149, "k2": 161, "k3": 0, "msm": 129, "hsm": 65, "online": 745, "holiday": "", "notes": "Superbowl Sunday"}, {"date": "2020-02-09", "a1": 699, "a2": 893, "a3": 0, "k1": 124, "k2": 203, "k3": 0, "msm": 141, "hsm": 180, "online": 1046, "holiday": "", "notes": ""}, {"date": "2020-02-16", "a1": 1318, "a2": 695, "a3": 0, "k1": 159, "k2": 169, "k3": 0, "msm": 0, "hsm": 0, "online": 803, "holiday": "", "notes": ""}, {"date": "2020-02-23", "a1": 667, "a2": 877, "a3": 0, "k1": 134, "k2": 213, "k3": 0, "msm": 152, "hsm": 150, "online": 891, "holiday": "", "notes": ""}, {"date": "2020-03-01", "a1": 644, "a2": 823, "a3": 0, "k1": 147, "k2": 195, "k3": 0, "msm": 129, "hsm": 125, "online": 910, "holiday": "", "notes": ""}, {"date": "2020-03-08", "a1": 497, "a2": 725, "a3": 0, "k1": 101, "k2": 159, "k3": 0, "msm": 106, "hsm": 133, "online": 915, "holiday": "", "notes": "Time Change, Spring Break, Coronavirus"}, {"date": "2020-03-15", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 3198, "holiday": "Corona Virus Week 1", "notes": ""}, {"date": "2020-03-22", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 3577, "holiday": "Corona Virus Week 2", "notes": ""}, {"date": "2020-03-29", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 3283, "holiday": "Corona Virus Week 3", "notes": ""}, {"date": "2020-04-05", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 3775, "holiday": "Corona Virus Week 4", "notes": ""}, {"date": "2020-04-10", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2044, "holiday": "Good Friday", "notes": ""}, {"date": "2020-04-12", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 4408, "holiday": "Corona Virus Week 5", "notes": ""}, {"date": "2020-04-19", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2807, "holiday": "Corona Virus Week 6", "notes": ""}, {"date": "2020-04-26", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2794, "holiday": "Corona Virus Week 7", "notes": ""}, {"date": "2020-05-03", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2950, "holiday": "Corona Virus Week 8", "notes": ""}, {"date": "2020-05-10", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2058, "holiday": "Corona Virus Week 9", "notes": ""}, {"date": "2020-05-17", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2403, "holiday": "Corona Virus Week 10", "notes": ""}, {"date": "2020-05-24", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2158, "holiday": "Corona Virus Week 11", "notes": ""}, {"date": "2020-05-31", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2377, "holiday": "Corona Virus Week 12", "notes": ""}, {"date": "2020-06-07", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2003, "holiday": "Corona Virus Week 13", "notes": ""}, {"date": "2020-06-14", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1867, "holiday": "Corona Virus Week 14", "notes": ""}, {"date": "2020-06-21", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1634, "holiday": "Corona Virus Week 15", "notes": ""}, {"date": "2020-06-28", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1629, "holiday": "Corona Virus Week 16", "notes": ""}, {"date": "2020-07-05", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2330, "holiday": "Corona Virus Week 17", "notes": ""}, {"date": "2020-07-12", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1884, "holiday": "Corona Virus Week 18", "notes": ""}, {"date": "2020-07-19", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2270, "holiday": "Corona Virus Week 19", "notes": ""}, {"date": "2020-07-26", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2204, "holiday": "Corona Virus Week 20", "notes": ""}, {"date": "2020-08-02", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1935, "holiday": "Corona Virus Week 21", "notes": ""}, {"date": "2020-08-09", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1589, "holiday": "Corona Virus Week 22", "notes": ""}, {"date": "2020-08-16", "a1": 275, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1999, "holiday": "Corona Virus Week 23", "notes": ""}, {"date": "2020-08-23", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 185, "online": 1508, "holiday": "Corona Virus Week 24", "notes": ""}, {"date": "2020-08-30", "a1": 60, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 175, "online": 1653, "holiday": "Corona Virus Week 25", "notes": ""}, {"date": "2020-09-06", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1551, "holiday": "Corona Virus Week 26", "notes": ""}, {"date": "2020-09-13", "a1": 130, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 140, "online": 1371, "holiday": "Corona Virus Week 27", "notes": ""}, {"date": "2020-09-20", "a1": 515, "a2": 0, "a3": 0, "k1": 53, "k2": 0, "k3": 0, "msm": 115, "hsm": 120, "online": 1521, "holiday": "Corona Virus Week 28", "notes": "1st week back in WC. Only 1 service. Kids were zoom. "}, {"date": "2020-09-27", "a1": 444, "a2": 0, "a3": 0, "k1": 34, "k2": 0, "k3": 0, "msm": 92, "hsm": 110, "online": 1319, "holiday": "Corona Virus Week 29", "notes": ""}, {"date": "2020-10-04", "a1": 383, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 84, "hsm": 105, "online": 1116, "holiday": "Corona Virus Week 30", "notes": ""}, {"date": "2020-10-11", "a1": 407, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1147, "holiday": "Corona Virus Week 31", "notes": ""}, {"date": "2020-10-18", "a1": 74, "a2": 413, "a3": 0, "k1": 0, "k2": 102, "k3": 0, "msm": 98, "hsm": 120, "online": 1147, "holiday": "", "notes": ""}, {"date": "2020-10-25", "a1": 54, "a2": 402, "a3": 0, "k1": 0, "k2": 118, "k3": 0, "msm": 89, "hsm": 125, "online": 927, "holiday": "", "notes": "Started using FB 1 min views vs 10 second. "}, {"date": "2020-11-01", "a1": 48, "a2": 392, "a3": 0, "k1": 0, "k2": 120, "k3": 0, "msm": 79, "hsm": 100, "online": 850, "holiday": "", "notes": ""}, {"date": "2020-11-08", "a1": 44, "a2": 421, "a3": 0, "k1": 0, "k2": 116, "k3": 0, "msm": 87, "hsm": 105, "online": 855, "holiday": "", "notes": ""}, {"date": "2020-11-15", "a1": 53, "a2": 367, "a3": 0, "k1": 115, "k2": 0, "k3": 0, "msm": 63, "hsm": 85, "online": 841, "holiday": "", "notes": ""}, {"date": "2020-11-22", "a1": 27, "a2": 351, "a3": 0, "k1": 25, "k2": 0, "k3": 0, "msm": 0, "hsm": 80, "online": 977, "holiday": "", "notes": "Family Sunday"}, {"date": "2020-11-29", "a1": 4, "a2": 302, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 827, "holiday": "Thanksgiving Sunday", "notes": ""}, {"date": "2020-12-06", "a1": 32, "a2": 313, "a3": 0, "k1": 101, "k2": 0, "k3": 0, "msm": 53, "hsm": 80, "online": 754, "holiday": "", "notes": ""}, {"date": "2020-12-13", "a1": 39, "a2": 325, "a3": 0, "k1": 93, "k2": 0, "k3": 0, "msm": 50, "hsm": 90, "online": 846, "holiday": "", "notes": ""}, {"date": "2020-12-20", "a1": 18, "a2": 418, "a3": 0, "k1": 0, "k2": 28, "k3": 0, "msm": 0, "hsm": 0, "online": 1103, "holiday": "", "notes": ""}, {"date": "2020-12-24", "a1": 754, "a2": 241, "a3": 0, "k1": 23, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1085, "holiday": "Christmas Eve", "notes": ""}, {"date": "2020-12-27", "a1": 279, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 761, "holiday": "", "notes": ""}, {"date": "2021-01-03", "a1": 333, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 996, "holiday": "", "notes": ""}, {"date": "2021-01-10", "a1": 30, "a2": 261, "a3": 0, "k1": 67, "k2": 0, "k3": 0, "msm": 60, "hsm": 85, "online": 961, "holiday": "", "notes": ""}, {"date": "2021-01-17", "a1": 48, "a2": 365, "a3": 0, "k1": 78, "k2": 0, "k3": 0, "msm": 63, "hsm": 90, "online": 908, "holiday": "", "notes": ""}, {"date": "2021-01-24", "a1": 53, "a2": 436, "a3": 0, "k1": 103, "k2": 0, "k3": 0, "msm": 64, "hsm": 93, "online": 1434, "holiday": "", "notes": ""}, {"date": "2021-01-31", "a1": 28, "a2": 340, "a3": 0, "k1": 103, "k2": 0, "k3": 0, "msm": 60, "hsm": 82, "online": 1033, "holiday": "", "notes": ""}, {"date": "2021-02-07", "a1": 46, "a2": 362, "a3": 0, "k1": 100, "k2": 0, "k3": 0, "msm": 61, "hsm": 0, "online": 1076, "holiday": "", "notes": "Superbowl Sunday. No HSM. "}, {"date": "2021-02-14", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 2345, "holiday": "", "notes": "Blizzard. Online Services only"}, {"date": "2021-02-21", "a1": 25, "a2": 379, "a3": 0, "k1": 102, "k2": 0, "k3": 0, "msm": 72, "hsm": 96, "online": 988, "holiday": "", "notes": ""}, {"date": "2021-02-28", "a1": 430, "a2": 49, "a3": 0, "k1": 124, "k2": 0, "k3": 0, "msm": 69, "hsm": 95, "online": 869, "holiday": "", "notes": ""}, {"date": "2021-03-07", "a1": 46, "a2": 394, "a3": 0, "k1": 118, "k2": 0, "k3": 0, "msm": 93, "hsm": 75, "online": 834, "holiday": "", "notes": ""}, {"date": "2021-03-14", "a1": 25, "a2": 314, "a3": 0, "k1": 0, "k2": 34, "k3": 0, "msm": 0, "hsm": 0, "online": 901, "holiday": "", "notes": ""}, {"date": "2021-03-21", "a1": 37, "a2": 357, "a3": 0, "k1": 123, "k2": 0, "k3": 0, "msm": 73, "hsm": 90, "online": 808, "holiday": "", "notes": ""}, {"date": "2021-03-28", "a1": 101, "a2": 842, "a3": 0, "k1": 182, "k2": 0, "k3": 0, "msm": 82, "hsm": 95, "online": 1376, "holiday": "", "notes": ""}, {"date": "2021-04-02", "a1": 600, "a2": 0, "a3": 0, "k1": 29, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 615, "holiday": "", "notes": "Estimated Count"}, {"date": "2021-04-04", "a1": 922, "a2": 1032, "a3": 0, "k1": 51, "k2": 44, "k3": 0, "msm": 0, "hsm": 0, "online": 1785, "holiday": "", "notes": ""}, {"date": "2021-04-11", "a1": 62, "a2": 761, "a3": 0, "k1": 0, "k2": 174, "k3": 0, "msm": 83, "hsm": 110, "online": 1072, "holiday": "", "notes": "Week after Easter"}, {"date": "2021-04-18", "a1": 64, "a2": 704, "a3": 0, "k1": 0, "k2": 164, "k3": 0, "msm": 81, "hsm": 90, "online": 987, "holiday": "", "notes": ""}, {"date": "2021-04-25", "a1": 33, "a2": 1115, "a3": 0, "k1": 51, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1012, "holiday": "", "notes": ""}, {"date": "2021-05-02", "a1": 12, "a2": 923, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 100, "online": 1157, "holiday": "", "notes": ""}, {"date": "2021-05-09", "a1": 47, "a2": 769, "a3": 0, "k1": 157, "k2": 0, "k3": 0, "msm": 76, "hsm": 0, "online": 810, "holiday": "", "notes": ""}, {"date": "2021-05-16", "a1": 79, "a2": 782, "a3": 0, "k1": 163, "k2": 0, "k3": 0, "msm": 80, "hsm": 110, "online": 781, "holiday": "", "notes": ""}, {"date": "2021-05-23", "a1": 69, "a2": 771, "a3": 0, "k1": 198, "k2": 0, "k3": 0, "msm": 106, "hsm": 130, "online": 1083, "holiday": "", "notes": ""}, {"date": "2021-05-30", "a1": 43, "a2": 819, "a3": 0, "k1": 52, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 838, "holiday": "", "notes": ""}, {"date": "2021-06-06", "a1": 66, "a2": 785, "a3": 0, "k1": 170, "k2": 0, "k3": 0, "msm": 84, "hsm": 0, "online": 843, "holiday": "", "notes": ""}, {"date": "2021-06-13", "a1": 64, "a2": 734, "a3": 0, "k1": 146, "k2": 0, "k3": 0, "msm": 80, "hsm": 0, "online": 717, "holiday": "", "notes": ""}, {"date": "2021-06-20", "a1": 73, "a2": 804, "a3": 0, "k1": 149, "k2": 0, "k3": 0, "msm": 64, "hsm": 0, "online": 588, "holiday": "", "notes": ""}, {"date": "2021-06-27", "a1": 87, "a2": 815, "a3": 0, "k1": 144, "k2": 0, "k3": 0, "msm": 56, "hsm": 0, "online": 652, "holiday": "", "notes": ""}, {"date": "2021-07-04", "a1": 22, "a2": 713, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 610, "holiday": "", "notes": "4th of July. All in Family Sunday"}, {"date": "2021-07-11", "a1": 65, "a2": 815, "a3": 0, "k1": 42, "k2": 0, "k3": 0, "msm": 0, "hsm": 80, "online": 648, "holiday": "", "notes": ""}, {"date": "2021-07-18", "a1": 65, "a2": 1041, "a3": 0, "k1": 71, "k2": 0, "k3": 0, "msm": 0, "hsm": 54, "online": 695, "holiday": "", "notes": ""}, {"date": "2021-07-25", "a1": 64, "a2": 820, "a3": 0, "k1": 48, "k2": 0, "k3": 0, "msm": 0, "hsm": 92, "online": 609, "holiday": "", "notes": ""}, {"date": "2021-08-01", "a1": 54, "a2": 828, "a3": 0, "k1": 146, "k2": 0, "k3": 0, "msm": 75, "hsm": 0, "online": 704, "holiday": "", "notes": ""}, {"date": "2021-08-08", "a1": 61, "a2": 833, "a3": 0, "k1": 0, "k2": 172, "k3": 0, "msm": 84, "hsm": 0, "online": 970, "holiday": "", "notes": ""}, {"date": "2021-08-15", "a1": 58, "a2": 847, "a3": 0, "k1": 0, "k2": 163, "k3": 0, "msm": 105, "hsm": 130, "online": 661, "holiday": "", "notes": ""}, {"date": "2021-08-22", "a1": 64, "a2": 793, "a3": 0, "k1": 0, "k2": 174, "k3": 0, "msm": 87, "hsm": 116, "online": 710, "holiday": "", "notes": ""}, {"date": "2021-08-29", "a1": 69, "a2": 753, "a3": 0, "k1": 0, "k2": 144, "k3": 0, "msm": 85, "hsm": 150, "online": 800, "holiday": "", "notes": ""}, {"date": "2021-09-05", "a1": 16, "a2": 530, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 685, "holiday": "", "notes": "Labor Day weekend, all in family Sunday, HSM at Sky Ranch"}, {"date": "2021-09-12", "a1": 396, "a2": 589, "a3": 0, "k1": 68, "k2": 132, "k3": 0, "msm": 104, "hsm": 150, "online": 665, "holiday": "", "notes": "First day back to 9 & 11"}, {"date": "2021-09-19", "a1": 371, "a2": 568, "a3": 0, "k1": 63, "k2": 128, "k3": 0, "msm": 96, "hsm": 135, "online": 606, "holiday": "", "notes": ""}, {"date": "2021-09-26", "a1": 356, "a2": 529, "a3": 0, "k1": 70, "k2": 119, "k3": 0, "msm": 110, "hsm": 115, "online": 672, "holiday": "", "notes": ""}, {"date": "2021-10-03", "a1": 402, "a2": 465, "a3": 0, "k1": 57, "k2": 107, "k3": 0, "msm": 95, "hsm": 120, "online": 587, "holiday": "", "notes": ""}, {"date": "2021-10-10", "a1": 305, "a2": 511, "a3": 0, "k1": 56, "k2": 115, "k3": 0, "msm": 91, "hsm": 125, "online": 547, "holiday": "", "notes": ""}, {"date": "2021-10-17", "a1": 352, "a2": 455, "a3": 0, "k1": 70, "k2": 104, "k3": 0, "msm": 0, "hsm": 120, "online": 620, "holiday": "", "notes": ""}, {"date": "2021-10-24", "a1": 419, "a2": 533, "a3": 0, "k1": 66, "k2": 121, "k3": 0, "msm": 96, "hsm": 130, "online": 675, "holiday": "", "notes": ""}, {"date": "2021-10-31", "a1": 381, "a2": 504, "a3": 0, "k1": 65, "k2": 116, "k3": 0, "msm": 95, "hsm": 0, "online": 627, "holiday": "", "notes": ""}, {"date": "2021-11-07", "a1": 397, "a2": 489, "a3": 0, "k1": 82, "k2": 93, "k3": 0, "msm": 98, "hsm": 86, "online": 573, "holiday": "", "notes": ""}, {"date": "2021-11-14", "a1": 436, "a2": 483, "a3": 0, "k1": 68, "k2": 92, "k3": 0, "msm": 79, "hsm": 97, "online": 597, "holiday": "", "notes": ""}, {"date": "2021-11-21", "a1": 396, "a2": 591, "a3": 0, "k1": 26, "k2": 31, "k3": 0, "msm": 0, "hsm": 130, "online": 589, "holiday": "", "notes": "Family Sunday"}, {"date": "2021-11-28", "a1": 376, "a2": 613, "a3": 0, "k1": 54, "k2": 136, "k3": 0, "msm": 92, "hsm": 0, "online": 591, "holiday": "", "notes": ""}, {"date": "2021-12-05", "a1": 453, "a2": 596, "a3": 0, "k1": 73, "k2": 132, "k3": 0, "msm": 101, "hsm": 110, "online": 679, "holiday": "", "notes": ""}, {"date": "2021-12-12", "a1": 438, "a2": 588, "a3": 0, "k1": 81, "k2": 112, "k3": 0, "msm": 95, "hsm": 115, "online": 624, "holiday": "", "notes": ""}, {"date": "2021-12-19", "a1": 433, "a2": 581, "a3": 0, "k1": 29, "k2": 24, "k3": 0, "msm": 0, "hsm": 135, "online": 594, "holiday": "", "notes": ""}, {"date": "2021-12-24", "a1": 1141, "a2": 904, "a3": 0, "k1": 25, "k2": 12, "k3": 0, "msm": 0, "hsm": 0, "online": 942, "holiday": "", "notes": "Christmas Eve"}, {"date": "2021-12-26", "a1": 353, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 451, "holiday": "", "notes": "One service at 10:30 am"}, {"date": "2022-01-02", "a1": 229, "a2": 404, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 837, "holiday": "", "notes": "Day after new years, very cold, Brandon preaching. "}, {"date": "2022-01-09", "a1": 328, "a2": 473, "a3": 0, "k1": 58, "k2": 91, "k3": 0, "msm": 92, "hsm": 0, "online": 843, "holiday": "", "notes": ""}, {"date": "2022-01-16", "a1": 287, "a2": 410, "a3": 0, "k1": 52, "k2": 80, "k3": 0, "msm": 80, "hsm": 100, "online": 914, "holiday": "", "notes": ""}, {"date": "2022-01-23", "a1": 345, "a2": 527, "a3": 0, "k1": 56, "k2": 108, "k3": 0, "msm": 78, "hsm": 115, "online": 822, "holiday": "", "notes": ""}, {"date": "2022-01-30", "a1": 364, "a2": 502, "a3": 0, "k1": 69, "k2": 125, "k3": 0, "msm": 101, "hsm": 129, "online": 719, "holiday": "", "notes": ""}, {"date": "2022-02-06", "a1": 396, "a2": 621, "a3": 0, "k1": 76, "k2": 127, "k3": 0, "msm": 106, "hsm": 115, "online": 753, "holiday": "", "notes": ""}, {"date": "2022-02-13", "a1": 400, "a2": 562, "a3": 0, "k1": 80, "k2": 142, "k3": 0, "msm": 103, "hsm": 0, "online": 638, "holiday": "", "notes": "Super Bowl Sunday "}, {"date": "2022-02-20", "a1": 389, "a2": 1001, "a3": 0, "k1": 47, "k2": 34, "k3": 0, "msm": 0, "hsm": 0, "online": 701, "holiday": "", "notes": ""}, {"date": "2022-02-27", "a1": 443, "a2": 622, "a3": 0, "k1": 111, "k2": 141, "k3": 0, "msm": 99, "hsm": 105, "online": 748, "holiday": "", "notes": ""}, {"date": "2022-03-06", "a1": 447, "a2": 624, "a3": 0, "k1": 99, "k2": 142, "k3": 0, "msm": 97, "hsm": 105, "online": 727, "holiday": "", "notes": ""}, {"date": "2022-03-13", "a1": 328, "a2": 498, "a3": 0, "k1": 23, "k2": 36, "k3": 0, "msm": 0, "hsm": 0, "online": 667, "holiday": "", "notes": ""}, {"date": "2022-03-20", "a1": 433, "a2": 600, "a3": 0, "k1": 80, "k2": 129, "k3": 0, "msm": 92, "hsm": 105, "online": 678, "holiday": "", "notes": ""}, {"date": "2022-03-27", "a1": 499, "a2": 633, "a3": 0, "k1": 91, "k2": 158, "k3": 0, "msm": 103, "hsm": 105, "online": 741, "holiday": "", "notes": ""}, {"date": "2022-04-03", "a1": 456, "a2": 602, "a3": 0, "k1": 85, "k2": 146, "k3": 0, "msm": 94, "hsm": 105, "online": 788, "holiday": "", "notes": ""}, {"date": "2022-04-10", "a1": 449, "a2": 619, "a3": 0, "k1": 96, "k2": 167, "k3": 0, "msm": 92, "hsm": 140, "online": 659, "holiday": "", "notes": ""}, {"date": "2022-04-17", "a1": 1272, "a2": 1635, "a3": 0, "k1": 78, "k2": 65, "k3": 0, "msm": 0, "hsm": 0, "online": 915, "holiday": "", "notes": ""}, {"date": "2022-04-24", "a1": 476, "a2": 595, "a3": 0, "k1": 100, "k2": 158, "k3": 0, "msm": 100, "hsm": 88, "online": 690, "holiday": "", "notes": ""}, {"date": "2022-05-01", "a1": 475, "a2": 695, "a3": 0, "k1": 81, "k2": 177, "k3": 0, "msm": 100, "hsm": 85, "online": 685, "holiday": "", "notes": ""}, {"date": "2022-05-08", "a1": 512, "a2": 704, "a3": 0, "k1": 104, "k2": 149, "k3": 0, "msm": 82, "hsm": 0, "online": 520, "holiday": "", "notes": ""}, {"date": "2022-05-15", "a1": 498, "a2": 668, "a3": 0, "k1": 78, "k2": 150, "k3": 0, "msm": 91, "hsm": 95, "online": 632, "holiday": "", "notes": ""}, {"date": "2022-05-22", "a1": 794, "a2": 0, "a3": 0, "k1": 239, "k2": 0, "k3": 0, "msm": 111, "hsm": 105, "online": 502, "holiday": "", "notes": ""}, {"date": "2022-05-29", "a1": 332, "a2": 462, "a3": 0, "k1": 32, "k2": 36, "k3": 0, "msm": 0, "hsm": 0, "online": 578, "holiday": "", "notes": ""}, {"date": "2022-06-05", "a1": 407, "a2": 583, "a3": 0, "k1": 70, "k2": 132, "k3": 0, "msm": 93, "hsm": 0, "online": 635, "holiday": "", "notes": ""}, {"date": "2022-06-12", "a1": 401, "a2": 580, "a3": 0, "k1": 64, "k2": 128, "k3": 0, "msm": 91, "hsm": 0, "online": 768, "holiday": "", "notes": ""}, {"date": "2022-06-19", "a1": 503, "a2": 588, "a3": 0, "k1": 78, "k2": 96, "k3": 0, "msm": 82, "hsm": 0, "online": 675, "holiday": "", "notes": ""}, {"date": "2022-06-26", "a1": 869, "a2": 541, "a3": 0, "k1": 68, "k2": 110, "k3": 0, "msm": 90, "hsm": 0, "online": 733, "holiday": "", "notes": ""}, {"date": "2022-07-02", "a1": 490, "a2": 639, "a3": 0, "k1": 102, "k2": 86, "k3": 0, "msm": 61, "hsm": 0, "online": 478, "holiday": "", "notes": ""}, {"date": "2022-07-10", "a1": 370, "a2": 486, "a3": 0, "k1": 34, "k2": 36, "k3": 0, "msm": 0, "hsm": 60, "online": 599, "holiday": "", "notes": ""}, {"date": "2022-07-17", "a1": 352, "a2": 631, "a3": 0, "k1": 31, "k2": 33, "k3": 0, "msm": 0, "hsm": 72, "online": 564, "holiday": "", "notes": ""}, {"date": "2022-07-24", "a1": 401, "a2": 555, "a3": 0, "k1": 36, "k2": 22, "k3": 0, "msm": 0, "hsm": 65, "online": 550, "holiday": "", "notes": ""}, {"date": "2022-07-31", "a1": 424, "a2": 646, "a3": 0, "k1": 34, "k2": 28, "k3": 0, "msm": 0, "hsm": 60, "online": 824, "holiday": "", "notes": "Gene Getz"}, {"date": "2022-08-07", "a1": 454, "a2": 625, "a3": 0, "k1": 95, "k2": 120, "k3": 0, "msm": 95, "hsm": 0, "online": 652, "holiday": "", "notes": ""}, {"date": "2022-08-14", "a1": 524, "a2": 648, "a3": 0, "k1": 106, "k2": 124, "k3": 0, "msm": 110, "hsm": 155, "online": 544, "holiday": "", "notes": "Online Issues"}, {"date": "2022-08-21", "a1": 412, "a2": 669, "a3": 0, "k1": 78, "k2": 155, "k3": 0, "msm": 112, "hsm": 140, "online": 589, "holiday": "", "notes": ""}, {"date": "2022-08-28", "a1": 454, "a2": 629, "a3": 0, "k1": 108, "k2": 135, "k3": 0, "msm": 110, "hsm": 110, "online": 613, "holiday": "", "notes": ""}, {"date": "2022-09-04", "a1": 421, "a2": 459, "a3": 0, "k1": 54, "k2": 31, "k3": 0, "msm": 0, "hsm": 0, "online": 474, "holiday": "", "notes": ""}, {"date": "2022-09-11", "a1": 464, "a2": 619, "a3": 0, "k1": 100, "k2": 137, "k3": 0, "msm": 107, "hsm": 120, "online": 697, "holiday": "", "notes": ""}, {"date": "2022-09-18", "a1": 510, "a2": 638, "a3": 0, "k1": 116, "k2": 137, "k3": 0, "msm": 90, "hsm": 120, "online": 629, "holiday": "", "notes": ""}, {"date": "2022-09-25", "a1": 494, "a2": 589, "a3": 0, "k1": 113, "k2": 126, "k3": 0, "msm": 99, "hsm": 115, "online": 626, "holiday": "", "notes": ""}, {"date": "2022-10-02", "a1": 458, "a2": 521, "a3": 0, "k1": 81, "k2": 109, "k3": 0, "msm": 104, "hsm": 110, "online": 0, "holiday": "", "notes": ""}, {"date": "2022-10-09", "a1": 464, "a2": 556, "a3": 0, "k1": 74, "k2": 119, "k3": 0, "msm": 87, "hsm": 110, "online": 507, "holiday": "", "notes": ""}, {"date": "2022-10-16", "a1": 421, "a2": 557, "a3": 0, "k1": 87, "k2": 123, "k3": 0, "msm": 93, "hsm": 115, "online": 524, "holiday": "", "notes": ""}, {"date": "2022-10-23", "a1": 478, "a2": 507, "a3": 0, "k1": 105, "k2": 118, "k3": 0, "msm": 0, "hsm": 110, "online": 600, "holiday": "", "notes": ""}, {"date": "2022-10-30", "a1": 490, "a2": 550, "a3": 0, "k1": 112, "k2": 106, "k3": 0, "msm": 102, "hsm": 110, "online": 520, "holiday": "", "notes": ""}, {"date": "2022-11-06", "a1": 521, "a2": 582, "a3": 0, "k1": 114, "k2": 111, "k3": 0, "msm": 87, "hsm": 100, "online": 530, "holiday": "", "notes": ""}, {"date": "2022-11-13", "a1": 458, "a2": 534, "a3": 0, "k1": 105, "k2": 101, "k3": 0, "msm": 86, "hsm": 95, "online": 496, "holiday": "", "notes": ""}, {"date": "2022-11-20", "a1": 500, "a2": 625, "a3": 0, "k1": 45, "k2": 28, "k3": 0, "msm": 0, "hsm": 110, "online": 509, "holiday": "", "notes": "Family Sunday Thanksgiving Week"}, {"date": "2022-11-27", "a1": 429, "a2": 594, "a3": 0, "k1": 78, "k2": 112, "k3": 0, "msm": 80, "hsm": 0, "online": 590, "holiday": "", "notes": ""}, {"date": "2022-12-04", "a1": 493, "a2": 586, "a3": 0, "k1": 92, "k2": 133, "k3": 0, "msm": 79, "hsm": 95, "online": 679, "holiday": "", "notes": ""}, {"date": "2022-12-11", "a1": 425, "a2": 601, "a3": 0, "k1": 95, "k2": 115, "k3": 0, "msm": 82, "hsm": 95, "online": 660, "holiday": "", "notes": ""}, {"date": "2022-12-18", "a1": 411, "a2": 605, "a3": 0, "k1": 40, "k2": 32, "k3": 0, "msm": 0, "hsm": 0, "online": 586, "holiday": "", "notes": ""}, {"date": "2022-12-24", "a1": 2000, "a2": 1200, "a3": 0, "k1": 61, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 513, "holiday": "", "notes": "Camera issues"}, {"date": "2023-01-01", "a1": 700, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 591, "holiday": "", "notes": "One service 10am"}, {"date": "2023-01-08", "a1": 574, "a2": 722, "a3": 0, "k1": 124, "k2": 146, "k3": 0, "msm": 92, "hsm": 120, "online": 686, "holiday": "", "notes": ""}, {"date": "2023-01-15", "a1": 545, "a2": 714, "a3": 0, "k1": 120, "k2": 142, "k3": 0, "msm": 94, "hsm": 110, "online": 765, "holiday": "", "notes": ""}, {"date": "2023-01-22", "a1": 541, "a2": 623, "a3": 0, "k1": 105, "k2": 138, "k3": 0, "msm": 85, "hsm": 100, "online": 667, "holiday": "", "notes": ""}, {"date": "2023-01-29", "a1": 531, "a2": 688, "a3": 0, "k1": 109, "k2": 150, "k3": 0, "msm": 101, "hsm": 82, "online": 654, "holiday": "", "notes": ""}, {"date": "2023-02-05", "a1": 592, "a2": 699, "a3": 0, "k1": 123, "k2": 157, "k3": 0, "msm": 99, "hsm": 115, "online": 684, "holiday": "", "notes": ""}, {"date": "2023-02-12", "a1": 536, "a2": 611, "a3": 0, "k1": 117, "k2": 167, "k3": 0, "msm": 96, "hsm": 60, "online": 673, "holiday": "", "notes": "Super bowl Sunday"}, {"date": "2023-02-19", "a1": 522, "a2": 1043, "a3": 0, "k1": 76, "k2": 52, "k3": 0, "msm": 0, "hsm": 0, "online": 906, "holiday": "", "notes": ""}, {"date": "2023-02-26", "a1": 559, "a2": 662, "a3": 0, "k1": 128, "k2": 155, "k3": 0, "msm": 85, "hsm": 110, "online": 604, "holiday": "", "notes": ""}, {"date": "2023-03-05", "a1": 558, "a2": 632, "a3": 0, "k1": 115, "k2": 124, "k3": 0, "msm": 80, "hsm": 100, "online": 668, "holiday": "", "notes": ""}, {"date": "2023-03-12", "a1": 385, "a2": 586, "a3": 0, "k1": 44, "k2": 49, "k3": 0, "msm": 0, "hsm": 0, "online": 675, "holiday": "", "notes": ""}, {"date": "2023-03-19", "a1": 514, "a2": 630, "a3": 0, "k1": 116, "k2": 136, "k3": 0, "msm": 75, "hsm": 105, "online": 727, "holiday": "", "notes": ""}, {"date": "2023-03-26", "a1": 538, "a2": 692, "a3": 0, "k1": 101, "k2": 143, "k3": 0, "msm": 91, "hsm": 98, "online": 682, "holiday": "", "notes": ""}, {"date": "2023-04-02", "a1": 555, "a2": 697, "a3": 0, "k1": 130, "k2": 151, "k3": 0, "msm": 86, "hsm": 80, "online": 743, "holiday": "", "notes": ""}, {"date": "2023-04-07", "a1": 949, "a2": 0, "a3": 0, "k1": 39, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 371, "holiday": "", "notes": ""}, {"date": "2023-04-09", "a1": 1624, "a2": 1412, "a3": 0, "k1": 104, "k2": 66, "k3": 0, "msm": 0, "hsm": 0, "online": 765, "holiday": "", "notes": "Easter"}, {"date": "2023-04-16", "a1": 567, "a2": 684, "a3": 0, "k1": 130, "k2": 125, "k3": 0, "msm": 98, "hsm": 85, "online": 703, "holiday": "", "notes": "Week After Easter"}, {"date": "2023-04-23", "a1": 537, "a2": 553, "a3": 0, "k1": 132, "k2": 106, "k3": 0, "msm": 88, "hsm": 90, "online": 751, "holiday": "", "notes": ""}, {"date": "2023-04-30", "a1": 537, "a2": 553, "a3": 0, "k1": 132, "k2": 106, "k3": 0, "msm": 88, "hsm": 90, "online": 751, "holiday": "", "notes": ""}, {"date": "2023-05-07", "a1": 591, "a2": 791, "a3": 0, "k1": 123, "k2": 162, "k3": 0, "msm": 91, "hsm": 75, "online": 836, "holiday": "", "notes": "Issues with facebook. "}, {"date": "2023-05-14", "a1": 650, "a2": 751, "a3": 0, "k1": 138, "k2": 123, "k3": 0, "msm": 84, "hsm": 0, "online": 763, "holiday": "", "notes": ""}, {"date": "2023-05-21", "a1": 575, "a2": 657, "a3": 0, "k1": 120, "k2": 159, "k3": 0, "msm": 110, "hsm": 105, "online": 782, "holiday": "", "notes": ""}, {"date": "2023-05-28", "a1": 511, "a2": 588, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 743, "holiday": "", "notes": ""}, {"date": "2023-06-04", "a1": 554, "a2": 725, "a3": 0, "k1": 73, "k2": 45, "k3": 0, "msm": 0, "hsm": 0, "online": 735, "holiday": "", "notes": ""}, {"date": "2023-06-11", "a1": 570, "a2": 743, "a3": 0, "k1": 150, "k2": 101, "k3": 0, "msm": 70, "hsm": 60, "online": 897, "holiday": "", "notes": ""}, {"date": "2023-06-18", "a1": 568, "a2": 685, "a3": 0, "k1": 99, "k2": 105, "k3": 0, "msm": 58, "hsm": 40, "online": 631, "holiday": "", "notes": "Father's Day"}, {"date": "2023-06-25", "a1": 581, "a2": 677, "a3": 0, "k1": 103, "k2": 125, "k3": 0, "msm": 75, "hsm": 58, "online": 873, "holiday": "", "notes": ""}, {"date": "2023-07-02", "a1": 490, "a2": 639, "a3": 0, "k1": 102, "k2": 86, "k3": 0, "msm": 61, "hsm": 0, "online": 478, "holiday": "", "notes": ""}, {"date": "2023-07-09", "a1": 452, "a2": 627, "a3": 0, "k1": 97, "k2": 86, "k3": 0, "msm": 62, "hsm": 65, "online": 819, "holiday": "", "notes": ""}, {"date": "2023-07-16", "a1": 492, "a2": 665, "a3": 0, "k1": 117, "k2": 113, "k3": 0, "msm": 65, "hsm": 0, "online": 904, "holiday": "", "notes": ""}, {"date": "2023-07-23", "a1": 474, "a2": 797, "a3": 0, "k1": 57, "k2": 32, "k3": 0, "msm": 0, "hsm": 0, "online": 1087, "holiday": "", "notes": "Facebook trolls, Nirup preaching, "}, {"date": "2023-07-30", "a1": 572, "a2": 734, "a3": 0, "k1": 67, "k2": 54, "k3": 0, "msm": 0, "hsm": 0, "online": 807, "holiday": "", "notes": ""}, {"date": "2023-08-06", "a1": 584, "a2": 844, "a3": 0, "k1": 72, "k2": 46, "k3": 0, "msm": 0, "hsm": 0, "online": 864, "holiday": "", "notes": "Together Sunday"}, {"date": "2023-08-13", "a1": 560, "a2": 817, "a3": 0, "k1": 147, "k2": 153, "k3": 0, "msm": 102, "hsm": 125, "online": 1134, "holiday": "", "notes": "Audio issues online may be skewd higher number"}, {"date": "2023-08-20", "a1": 544, "a2": 755, "a3": 0, "k1": 143, "k2": 137, "k3": 0, "msm": 109, "hsm": 128, "online": 793, "holiday": "", "notes": ""}, {"date": "2023-08-27", "a1": 573, "a2": 780, "a3": 0, "k1": 120, "k2": 157, "k3": 0, "msm": 105, "hsm": 111, "online": 835, "holiday": "", "notes": ""}, {"date": "2023-09-03", "a1": 482, "a2": 578, "a3": 0, "k1": 67, "k2": 43, "k3": 0, "msm": 0, "hsm": 0, "online": 984, "holiday": "", "notes": ""}, {"date": "2023-09-10", "a1": 595, "a2": 719, "a3": 0, "k1": 154, "k2": 145, "k3": 0, "msm": 100, "hsm": 114, "online": 807, "holiday": "", "notes": ""}, {"date": "2023-09-17", "a1": 612, "a2": 674, "a3": 0, "k1": 142, "k2": 135, "k3": 0, "msm": 109, "hsm": 117, "online": 854, "holiday": "", "notes": ""}, {"date": "2023-09-24", "a1": 559, "a2": 719, "a3": 0, "k1": 158, "k2": 140, "k3": 0, "msm": 111, "hsm": 110, "online": 742, "holiday": "", "notes": ""}, {"date": "2023-10-01", "a1": 534, "a2": 677, "a3": 0, "k1": 137, "k2": 140, "k3": 0, "msm": 104, "hsm": 0, "online": 736, "holiday": "", "notes": ""}, {"date": "2023-10-08", "a1": 508, "a2": 652, "a3": 0, "k1": 120, "k2": 106, "k3": 0, "msm": 0, "hsm": 80, "online": 862, "holiday": "", "notes": "MSM Fall Retreat"}, {"date": "2023-10-15", "a1": 510, "a2": 674, "a3": 0, "k1": 130, "k2": 124, "k3": 0, "msm": 68, "hsm": 100, "online": 727, "holiday": "", "notes": ""}, {"date": "2023-10-22", "a1": 532, "a2": 622, "a3": 0, "k1": 121, "k2": 119, "k3": 0, "msm": 87, "hsm": 90, "online": 793, "holiday": "", "notes": "Game 6 of ACLS"}, {"date": "2023-10-29", "a1": 554, "a2": 639, "a3": 0, "k1": 138, "k2": 124, "k3": 0, "msm": 86, "hsm": 90, "online": 966, "holiday": "", "notes": ""}, {"date": "2023-11-05", "a1": 654, "a2": 665, "a3": 0, "k1": 157, "k2": 117, "k3": 0, "msm": 91, "hsm": 80, "online": 846, "holiday": "", "notes": ""}, {"date": "2023-11-12", "a1": 602, "a2": 731, "a3": 0, "k1": 134, "k2": 149, "k3": 0, "msm": 101, "hsm": 90, "online": 889, "holiday": "", "notes": ""}, {"date": "2023-11-19", "a1": 539, "a2": 657, "a3": 0, "k1": 126, "k2": 112, "k3": 0, "msm": 68, "hsm": 95, "online": 667, "holiday": "", "notes": ""}, {"date": "2023-11-26", "a1": 624, "a2": 719, "a3": 0, "k1": 71, "k2": 37, "k3": 0, "msm": 0, "hsm": 0, "online": 691, "holiday": "", "notes": "Together Sunday"}, {"date": "2023-12-03", "a1": 593, "a2": 672, "a3": 0, "k1": 132, "k2": 165, "k3": 0, "msm": 96, "hsm": 0, "online": 825, "holiday": "", "notes": "HSM Did not meet - Phil Wicham Concert"}, {"date": "2023-12-10", "a1": 557, "a2": 765, "a3": 0, "k1": 134, "k2": 151, "k3": 0, "msm": 85, "hsm": 80, "online": 647, "holiday": "", "notes": ""}, {"date": "2023-12-17", "a1": 555, "a2": 743, "a3": 0, "k1": 112, "k2": 118, "k3": 0, "msm": 99, "hsm": 0, "online": 639, "holiday": "", "notes": ""}, {"date": "2023-12-24", "a1": 996, "a2": 1789, "a3": 0, "k1": 81, "k2": 61, "k3": 0, "msm": 0, "hsm": 0, "online": 677, "holiday": "Christmas Eve", "notes": ""}, {"date": "2023-12-31", "a1": 1028, "a2": 348, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 363, "holiday": "", "notes": "!0 am and 10 pm "}, {"date": "2024-01-07", "a1": 694, "a2": 958, "a3": 0, "k1": 162, "k2": 159, "k3": 0, "msm": 106, "hsm": 100, "online": 570, "holiday": "", "notes": ""}, {"date": "2024-01-14", "a1": 436, "a2": 529, "a3": 0, "k1": 85, "k2": 115, "k3": 0, "msm": 75, "hsm": 70, "online": 1013, "holiday": "", "notes": "Arctic Blast"}, {"date": "2024-01-21", "a1": 548, "a2": 725, "a3": 0, "k1": 124, "k2": 142, "k3": 0, "msm": 89, "hsm": 90, "online": 912, "holiday": "", "notes": ""}, {"date": "2024-01-28", "a1": 643, "a2": 827, "a3": 0, "k1": 152, "k2": 173, "k3": 0, "msm": 108, "hsm": 90, "online": 869, "holiday": "", "notes": ""}, {"date": "2024-02-04", "a1": 658, "a2": 792, "a3": 0, "k1": 154, "k2": 156, "k3": 0, "msm": 99, "hsm": 92, "online": 847, "holiday": "", "notes": ""}, {"date": "2024-02-11", "a1": 587, "a2": 720, "a3": 0, "k1": 136, "k2": 148, "k3": 0, "msm": 94, "hsm": 45, "online": 771, "holiday": "", "notes": ""}, {"date": "2024-02-18", "a1": 573, "a2": 1104, "a3": 0, "k1": 141, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 842, "holiday": "", "notes": "United Weekend"}, {"date": "2024-02-25", "a1": 627, "a2": 793, "a3": 0, "k1": 141, "k2": 171, "k3": 0, "msm": 102, "hsm": 85, "online": 877, "holiday": "", "notes": ""}, {"date": "2024-03-03", "a1": 705, "a2": 832, "a3": 0, "k1": 159, "k2": 142, "k3": 0, "msm": 79, "hsm": 95, "online": 1007, "holiday": "", "notes": ""}, {"date": "2024-03-10", "a1": 467, "a2": 775, "a3": 0, "k1": 63, "k2": 58, "k3": 0, "msm": 0, "hsm": 0, "online": 782, "holiday": "", "notes": ""}, {"date": "2024-03-17", "a1": 619, "a2": 730, "a3": 0, "k1": 121, "k2": 145, "k3": 0, "msm": 84, "hsm": 85, "online": 794, "holiday": "", "notes": ""}, {"date": "2024-03-24", "a1": 629, "a2": 833, "a3": 0, "k1": 135, "k2": 167, "k3": 0, "msm": 95, "hsm": 95, "online": 900, "holiday": "", "notes": ""}, {"date": "2024-03-29", "a1": 654, "a2": 654, "a3": 0, "k1": 36, "k2": 39, "k3": 0, "msm": 0, "hsm": 0, "online": 518, "holiday": "Good Friday", "notes": ""}, {"date": "2024-03-31", "a1": 1595, "a2": 1799, "a3": 0, "k1": 131, "k2": 75, "k3": 0, "msm": 0, "hsm": 0, "online": 963, "holiday": "Easter", "notes": ""}, {"date": "2024-04-07", "a1": 710, "a2": 813, "a3": 0, "k1": 140, "k2": 167, "k3": 0, "msm": 108, "hsm": 95, "online": 792, "holiday": "", "notes": ""}, {"date": "2024-04-14", "a1": 623, "a2": 758, "a3": 0, "k1": 154, "k2": 151, "k3": 0, "msm": 90, "hsm": 80, "online": 689, "holiday": "", "notes": ""}, {"date": "2024-04-21", "a1": 660, "a2": 745, "a3": 0, "k1": 149, "k2": 184, "k3": 0, "msm": 90, "hsm": 80, "online": 753, "holiday": "", "notes": ""}, {"date": "2024-04-28", "a1": 483, "a2": 707, "a3": 0, "k1": 125, "k2": 167, "k3": 0, "msm": 88, "hsm": 75, "online": 798, "holiday": "", "notes": ""}, {"date": "2024-05-05", "a1": 618, "a2": 891, "a3": 0, "k1": 144, "k2": 176, "k3": 0, "msm": 95, "hsm": 75, "online": 784, "holiday": "", "notes": ""}, {"date": "2024-05-12", "a1": 701, "a2": 862, "a3": 0, "k1": 146, "k2": 157, "k3": 0, "msm": 80, "hsm": 0, "online": 659, "holiday": "", "notes": ""}, {"date": "2024-05-19", "a1": 561, "a2": 747, "a3": 0, "k1": 112, "k2": 173, "k3": 0, "msm": 100, "hsm": 100, "online": 645, "holiday": "", "notes": ""}, {"date": "2024-05-26", "a1": 463, "a2": 554, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 648, "holiday": "Memorial Day", "notes": ""}, {"date": "2024-06-02", "a1": 619, "a2": 817, "a3": 0, "k1": 90, "k2": 37, "k3": 0, "msm": 0, "hsm": 0, "online": 622, "holiday": "", "notes": "Together Sunday"}, {"date": "2024-06-09", "a1": 629, "a2": 809, "a3": 0, "k1": 147, "k2": 129, "k3": 0, "msm": 89, "hsm": 0, "online": 670, "holiday": "", "notes": ""}, {"date": "2024-06-16", "a1": 626, "a2": 863, "a3": 0, "k1": 109, "k2": 119, "k3": 0, "msm": 76, "hsm": 0, "online": 663, "holiday": "", "notes": ""}, {"date": "2024-06-23", "a1": 536, "a2": 824, "a3": 0, "k1": 111, "k2": 132, "k3": 0, "msm": 87, "hsm": 0, "online": 938, "holiday": "", "notes": ""}, {"date": "2024-06-30", "a1": 610, "a2": 800, "a3": 0, "k1": 143, "k2": 131, "k3": 0, "msm": 75, "hsm": 0, "online": 644, "holiday": "", "notes": ""}, {"date": "2024-07-07", "a1": 550, "a2": 740, "a3": 0, "k1": 113, "k2": 120, "k3": 0, "msm": 73, "hsm": 60, "online": 691, "holiday": "", "notes": ""}, {"date": "2024-07-14", "a1": 534, "a2": 867, "a3": 0, "k1": 117, "k2": 134, "k3": 0, "msm": 94, "hsm": 65, "online": 703, "holiday": "", "notes": ""}, {"date": "2024-07-21", "a1": 556, "a2": 767, "a3": 0, "k1": 86, "k2": 32, "k3": 0, "msm": 0, "hsm": 75, "online": 784, "holiday": "", "notes": ""}, {"date": "2024-07-28", "a1": 541, "a2": 829, "a3": 0, "k1": 90, "k2": 32, "k3": 0, "msm": 0, "hsm": 0, "online": 607, "holiday": "", "notes": ""}, {"date": "2024-08-04", "a1": 611, "a2": 860, "a3": 0, "k1": 100, "k2": 49, "k3": 0, "msm": 0, "hsm": 0, "online": 671, "holiday": "", "notes": ""}, {"date": "2024-08-11", "a1": 657, "a2": 884, "a3": 0, "k1": 149, "k2": 173, "k3": 0, "msm": 124, "hsm": 135, "online": 667, "holiday": "", "notes": "Camera issues/WC attendance is an estimate"}, {"date": "2024-08-18", "a1": 625, "a2": 837, "a3": 0, "k1": 162, "k2": 179, "k3": 0, "msm": 124, "hsm": 130, "online": 727, "holiday": "", "notes": "Camera issues/WC attendance is an estimate"}, {"date": "2024-08-25", "a1": 625, "a2": 837, "a3": 0, "k1": 146, "k2": 174, "k3": 0, "msm": 125, "hsm": 138, "online": 732, "holiday": "", "notes": "Camera issues/WC attendance is an estimate"}, {"date": "2024-09-01", "a1": 664, "a2": 979, "a3": 0, "k1": 91, "k2": 53, "k3": 0, "msm": 0, "hsm": 0, "online": 932, "holiday": "", "notes": ""}, {"date": "2024-09-08", "a1": 640, "a2": 861, "a3": 0, "k1": 163, "k2": 174, "k3": 0, "msm": 119, "hsm": 140, "online": 651, "holiday": "", "notes": ""}, {"date": "2024-09-15", "a1": 651, "a2": 774, "a3": 0, "k1": 168, "k2": 142, "k3": 0, "msm": 95, "hsm": 110, "online": 866, "holiday": "", "notes": ""}, {"date": "2024-09-22", "a1": 673, "a2": 783, "a3": 0, "k1": 175, "k2": 146, "k3": 0, "msm": 103, "hsm": 125, "online": 820, "holiday": "", "notes": ""}, {"date": "2024-09-29", "a1": 703, "a2": 826, "a3": 0, "k1": 164, "k2": 158, "k3": 0, "msm": 105, "hsm": 0, "online": 640, "holiday": "", "notes": "Camera issues/WC attendance is an estimate"}, {"date": "2024-10-06", "a1": 647, "a2": 886, "a3": 0, "k1": 169, "k2": 157, "k3": 0, "msm": 105, "hsm": 95, "online": 724, "holiday": "", "notes": ""}, {"date": "2024-10-13", "a1": 586, "a2": 824, "a3": 0, "k1": 143, "k2": 133, "k3": 0, "msm": 101, "hsm": 90, "online": 654, "holiday": "", "notes": ""}, {"date": "2024-10-20", "a1": 565, "a2": 741, "a3": 0, "k1": 129, "k2": 133, "k3": 0, "msm": 0, "hsm": 115, "online": 653, "holiday": "", "notes": ""}, {"date": "2024-10-27", "a1": 616, "a2": 843, "a3": 0, "k1": 161, "k2": 150, "k3": 0, "msm": 93, "hsm": 110, "online": 750, "holiday": "", "notes": ""}, {"date": "2024-11-02", "a1": 674, "a2": 833, "a3": 0, "k1": 168, "k2": 166, "k3": 0, "msm": 105, "hsm": 115, "online": 745, "holiday": "", "notes": ""}, {"date": "2024-11-10", "a1": 679, "a2": 822, "a3": 0, "k1": 179, "k2": 158, "k3": 0, "msm": 88, "hsm": 110, "online": 627, "holiday": "", "notes": ""}, {"date": "2024-11-17", "a1": 553, "a2": 717, "a3": 0, "k1": 148, "k2": 135, "k3": 0, "msm": 97, "hsm": 115, "online": 610, "holiday": "", "notes": "Camera issues/WC attendance is an estimate"}, {"date": "2024-11-24", "a1": 640, "a2": 819, "a3": 0, "k1": 142, "k2": 128, "k3": 0, "msm": 75, "hsm": 110, "online": 561, "holiday": "", "notes": ""}, {"date": "2024-12-01", "a1": 617, "a2": 885, "a3": 0, "k1": 87, "k2": 42, "k3": 0, "msm": 0, "hsm": 0, "online": 634, "holiday": "", "notes": ""}, {"date": "2024-12-08", "a1": 568, "a2": 808, "a3": 0, "k1": 153, "k2": 143, "k3": 0, "msm": 97, "hsm": 125, "online": 642, "holiday": "", "notes": ""}, {"date": "2024-12-15", "a1": 654, "a2": 900, "a3": 0, "k1": 151, "k2": 139, "k3": 0, "msm": 121, "hsm": 110, "online": 661, "holiday": "", "notes": ""}, {"date": "2024-12-22", "a1": 680, "a2": 969, "a3": 0, "k1": 78, "k2": 49, "k3": 0, "msm": 0, "hsm": 0, "online": 627, "holiday": "", "notes": ""}, {"date": "2024-12-24", "a1": 1685, "a2": 1454, "a3": 0, "k1": 107, "k2": 28, "k3": 0, "msm": 0, "hsm": 0, "online": 804, "holiday": "Christmas Eve", "notes": ""}, {"date": "2024-12-29", "a1": 996, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 804, "holiday": "", "notes": ""}, {"date": "2025-01-05", "a1": 687, "a2": 804, "a3": 0, "k1": 160, "k2": 137, "k3": 0, "msm": 95, "hsm": 140, "online": 707, "holiday": "", "notes": ""}, {"date": "2025-01-12", "a1": 714, "a2": 1021, "a3": 0, "k1": 193, "k2": 150, "k3": 0, "msm": 117, "hsm": 150, "online": 740, "holiday": "", "notes": ""}, {"date": "2025-01-19", "a1": 560, "a2": 834, "a3": 0, "k1": 166, "k2": 124, "k3": 0, "msm": 105, "hsm": 145, "online": 794, "holiday": "", "notes": ""}, {"date": "2025-01-26", "a1": 685, "a2": 888, "a3": 0, "k1": 160, "k2": 145, "k3": 0, "msm": 103, "hsm": 145, "online": 807, "holiday": "", "notes": ""}, {"date": "2025-02-02", "a1": 670, "a2": 911, "a3": 0, "k1": 135, "k2": 140, "k3": 0, "msm": 111, "hsm": 120, "online": 731, "holiday": "", "notes": ""}, {"date": "2025-02-09", "a1": 627, "a2": 798, "a3": 0, "k1": 171, "k2": 137, "k3": 0, "msm": 103, "hsm": 75, "online": 647, "holiday": "", "notes": ""}, {"date": "2025-02-16", "a1": 578, "a2": 1351, "a3": 0, "k1": 110, "k2": 51, "k3": 0, "msm": 0, "hsm": 0, "online": 779, "holiday": "", "notes": ""}, {"date": "2025-02-23", "a1": 610, "a2": 875, "a3": 0, "k1": 143, "k2": 139, "k3": 0, "msm": 101, "hsm": 120, "online": 747, "holiday": "", "notes": ""}, {"date": "2025-03-02", "a1": 713, "a2": 870, "a3": 0, "k1": 173, "k2": 141, "k3": 0, "msm": 98, "hsm": 118, "online": 876, "holiday": "", "notes": ""}, {"date": "2025-03-09", "a1": 466, "a2": 790, "a3": 0, "k1": 129, "k2": 121, "k3": 0, "msm": 81, "hsm": 97, "online": 875, "holiday": "", "notes": ""}, {"date": "2025-03-16", "a1": 587, "a2": 878, "a3": 0, "k1": 93, "k2": 52, "k3": 0, "msm": 0, "hsm": 0, "online": 794, "holiday": "", "notes": ""}, {"date": "2025-03-23", "a1": 659, "a2": 919, "a3": 0, "k1": 170, "k2": 160, "k3": 0, "msm": 95, "hsm": 127, "online": 772, "holiday": "", "notes": ""}, {"date": "2025-03-30", "a1": 742, "a2": 951, "a3": 0, "k1": 196, "k2": 140, "k3": 0, "msm": 101, "hsm": 145, "online": 902, "holiday": "", "notes": ""}, {"date": "2025-04-06", "a1": 677, "a2": 824, "a3": 0, "k1": 189, "k2": 168, "k3": 0, "msm": 105, "hsm": 140, "online": 880, "holiday": "", "notes": ""}, {"date": "2025-04-13", "a1": 746, "a2": 885, "a3": 0, "k1": 197, "k2": 152, "k3": 0, "msm": 93, "hsm": 123, "online": 770, "holiday": "", "notes": ""}, {"date": "2025-04-20", "a1": 1618, "a2": 2045, "a3": 0, "k1": 162, "k2": 80, "k3": 0, "msm": 0, "hsm": 0, "online": 681, "holiday": "Easter", "notes": ""}, {"date": "2025-04-27", "a1": 662, "a2": 910, "a3": 0, "k1": 180, "k2": 152, "k3": 0, "msm": 89, "hsm": 127, "online": 748, "holiday": "", "notes": ""}, {"date": "2025-05-04", "a1": 719, "a2": 983, "a3": 0, "k1": 169, "k2": 154, "k3": 0, "msm": 100, "hsm": 110, "online": 1094, "holiday": "", "notes": ""}, {"date": "2025-05-11", "a1": 839, "a2": 1025, "a3": 0, "k1": 189, "k2": 128, "k3": 0, "msm": 81, "hsm": 0, "online": 575, "holiday": "", "notes": ""}, {"date": "2025-05-18", "a1": 610, "a2": 871, "a3": 0, "k1": 175, "k2": 160, "k3": 0, "msm": 113, "hsm": 135, "online": 745, "holiday": "", "notes": ""}, {"date": "2025-05-25", "a1": 480, "a2": 767, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 804, "holiday": "", "notes": "All Together Sunday"}, {"date": "2025-06-01", "a1": 659, "a2": 900, "a3": 0, "k1": 100, "k2": 48, "k3": 0, "msm": 0, "hsm": 0, "online": 707, "holiday": "", "notes": "Together Sunday"}, {"date": "2025-06-08", "a1": 763, "a2": 821, "a3": 0, "k1": 166, "k2": 127, "k3": 0, "msm": 95, "hsm": 0, "online": 805, "holiday": "", "notes": ""}, {"date": "2025-06-15", "a1": 743, "a2": 857, "a3": 0, "k1": 133, "k2": 127, "k3": 0, "msm": 70, "hsm": 0, "online": 751, "holiday": "", "notes": ""}, {"date": "2025-06-22", "a1": 597, "a2": 870, "a3": 0, "k1": 141, "k2": 138, "k3": 0, "msm": 90, "hsm": 0, "online": 723, "holiday": "", "notes": ""}, {"date": "2025-06-29", "a1": 633, "a2": 820, "a3": 0, "k1": 134, "k2": 147, "k3": 0, "msm": 88, "hsm": 0, "online": 757, "holiday": "", "notes": ""}, {"date": "2025-07-06", "a1": 655, "a2": 760, "a3": 0, "k1": 136, "k2": 130, "k3": 0, "msm": 64, "hsm": 75, "online": 735, "holiday": "", "notes": ""}, {"date": "2025-07-13", "a1": 631, "a2": 891, "a3": 0, "k1": 154, "k2": 149, "k3": 0, "msm": 88, "hsm": 55, "online": 790, "holiday": "", "notes": ""}, {"date": "2025-07-20", "a1": 681, "a2": 978, "a3": 0, "k1": 79, "k2": 45, "k3": 0, "msm": 0, "hsm": 75, "online": 759, "holiday": "", "notes": ""}, {"date": "2025-07-27", "a1": 627, "a2": 971, "a3": 0, "k1": 84, "k2": 49, "k3": 0, "msm": 0, "hsm": 85, "online": 716, "holiday": "", "notes": ""}, {"date": "2025-08-03", "a1": 674, "a2": 986, "a3": 0, "k1": 67, "k2": 49, "k3": 0, "msm": 0, "hsm": 0, "online": 731, "holiday": "", "notes": ""}, {"date": "2025-08-10", "a1": 691, "a2": 1002, "a3": 0, "k1": 142, "k2": 151, "k3": 0, "msm": 130, "hsm": 150, "online": 703, "holiday": "", "notes": ""}, {"date": "2025-08-17", "a1": 651, "a2": 887, "a3": 0, "k1": 179, "k2": 181, "k3": 0, "msm": 133, "hsm": 150, "online": 766, "holiday": "", "notes": ""}, {"date": "2025-08-24", "a1": 639, "a2": 890, "a3": 0, "k1": 134, "k2": 155, "k3": 0, "msm": 120, "hsm": 131, "online": 788, "holiday": "", "notes": ""}, {"date": "2025-08-31", "a1": 594, "a2": 880, "a3": 0, "k1": 70, "k2": 47, "k3": 0, "msm": 0, "hsm": 0, "online": 779, "holiday": "", "notes": ""}, {"date": "2025-09-07", "a1": 675, "a2": 911, "a3": 0, "k1": 153, "k2": 167, "k3": 0, "msm": 129, "hsm": 130, "online": 708, "holiday": "", "notes": ""}, {"date": "2025-09-14", "a1": 716, "a2": 947, "a3": 0, "k1": 160, "k2": 156, "k3": 0, "msm": 105, "hsm": 130, "online": 893, "holiday": "", "notes": ""}, {"date": "2025-09-21", "a1": 753, "a2": 952, "a3": 0, "k1": 168, "k2": 143, "k3": 0, "msm": 104, "hsm": 130, "online": 721, "holiday": "", "notes": ""}, {"date": "2025-09-28", "a1": 680, "a2": 890, "a3": 0, "k1": 144, "k2": 146, "k3": 0, "msm": 122, "hsm": 0, "online": 738, "holiday": "", "notes": ""}, {"date": "2025-10-05", "a1": 656, "a2": 881, "a3": 0, "k1": 134, "k2": 132, "k3": 0, "msm": 0, "hsm": 132, "online": 704, "holiday": "", "notes": ""}, {"date": "2025-10-12", "a1": 621, "a2": 800, "a3": 0, "k1": 132, "k2": 114, "k3": 0, "msm": 96, "hsm": 107, "online": 725, "holiday": "", "notes": ""}, {"date": "2025-10-19", "a1": 758, "a2": 904, "a3": 0, "k1": 144, "k2": 147, "k3": 0, "msm": 107, "hsm": 125, "online": 848, "holiday": "", "notes": ""}, {"date": "2025-10-26", "a1": 610, "a2": 914, "a3": 0, "k1": 136, "k2": 151, "k3": 0, "msm": 102, "hsm": 130, "online": 758, "holiday": "", "notes": ""}, {"date": "2025-11-02", "a1": 804, "a2": 907, "a3": 0, "k1": 179, "k2": 167, "k3": 0, "msm": 125, "hsm": 125, "online": 713, "holiday": "", "notes": ""}, {"date": "2025-11-09", "a1": 685, "a2": 841, "a3": 0, "k1": 146, "k2": 142, "k3": 0, "msm": 93, "hsm": 108, "online": 752, "holiday": "", "notes": ""}, {"date": "2025-11-16", "a1": 673, "a2": 866, "a3": 0, "k1": 130, "k2": 147, "k3": 0, "msm": 107, "hsm": 125, "online": 824, "holiday": "", "notes": ""}, {"date": "2025-11-23", "a1": 605, "a2": 891, "a3": 0, "k1": 130, "k2": 136, "k3": 0, "msm": 109, "hsm": 130, "online": 669, "holiday": "", "notes": ""}, {"date": "2025-11-30", "a1": 649, "a2": 861, "a3": 0, "k1": 68, "k2": 48, "k3": 0, "msm": 0, "hsm": 0, "online": 738, "holiday": "", "notes": ""}, {"date": "2025-12-07", "a1": 634, "a2": 929, "a3": 0, "k1": 132, "k2": 144, "k3": 0, "msm": 119, "hsm": 112, "online": 746, "holiday": "", "notes": ""}, {"date": "2025-12-14", "a1": 695, "a2": 840, "a3": 0, "k1": 136, "k2": 122, "k3": 0, "msm": 89, "hsm": 134, "online": 737, "holiday": "", "notes": ""}, {"date": "2025-12-21", "a1": 702, "a2": 972, "a3": 0, "k1": 95, "k2": 40, "k3": 0, "msm": 0, "hsm": 0, "online": 822, "holiday": "", "notes": ""}, {"date": "2025-12-24", "a1": 1844, "a2": 1498, "a3": 0, "k1": 89, "k2": 45, "k3": 0, "msm": 0, "hsm": 0, "online": 586, "holiday": "Christmas Eve", "notes": ""}, {"date": "2025-12-28", "a1": 1011, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 668, "holiday": "", "notes": ""}, {"date": "2026-01-04", "a1": 753, "a2": 1108, "a3": 0, "k1": 92, "k2": 49, "k3": 0, "msm": 0, "hsm": 105, "online": 805, "holiday": "", "notes": ""}, {"date": "2026-01-11", "a1": 811, "a2": 1073, "a3": 0, "k1": 168, "k2": 172, "k3": 0, "msm": 126, "hsm": 140, "online": 797, "holiday": "", "notes": ""}, {"date": "2026-01-18", "a1": 617, "a2": 996, "a3": 0, "k1": 140, "k2": 186, "k3": 0, "msm": 116, "hsm": 150, "online": 863, "holiday": "", "notes": ""}, {"date": "2026-01-25", "a1": 0, "a2": 0, "a3": 0, "k1": 0, "k2": 0, "k3": 0, "msm": 0, "hsm": 0, "online": 1906, "holiday": "", "notes": ""}, {"date": "2026-02-01", "a1": 604, "a2": 964, "a3": 0, "k1": 142, "k2": 165, "k3": 0, "msm": 113, "hsm": 140, "online": 995, "holiday": "", "notes": ""}, {"date": "2026-02-08", "a1": 681, "a2": 969, "a3": 0, "k1": 135, "k2": 164, "k3": 0, "msm": 108, "hsm": 0, "online": 922, "holiday": "", "notes": "HSM Flag Footbal"}, {"date": "2026-02-15", "a1": 573, "a2": 1454, "a3": 0, "k1": 86, "k2": 49, "k3": 0, "msm": 0, "hsm": 0, "online": 909, "holiday": "", "notes": "United Weekend"}, {"date": "2026-02-22", "a1": 624, "a2": 841, "a3": 0, "k1": 140, "k2": 137, "k3": 0, "msm": 99, "hsm": 117, "online": 764, "holiday": "", "notes": ""}, {"date": "2026-03-01", "a1": 668, "a2": 899, "a3": 0, "k1": 148, "k2": 172, "k3": 0, "msm": 108, "hsm": 115, "online": 915, "holiday": "", "notes": ""}, {"date": "2026-03-08", "a1": 546, "a2": 989, "a3": 0, "k1": 116, "k2": 176, "k3": 0, "msm": 112, "hsm": 125, "online": 874, "holiday": "", "notes": ""}, {"date": "2026-03-15", "a1": 623, "a2": 864, "a3": 0, "k1": 120, "k2": 141, "k3": 0, "msm": 81, "hsm": 87, "online": 836, "holiday": "", "notes": ""}, {"date": "2026-03-22", "a1": 616, "a2": 947, "a3": 0, "k1": 106, "k2": 53, "k3": 0, "msm": 0, "hsm": 0, "online": 754, "holiday": "", "notes": ""}, {"date": "2026-03-29", "a1": 698, "a2": 1000, "a3": 0, "k1": 151, "k2": 162, "k3": 0, "msm": 109, "hsm": 122, "online": 742, "holiday": "", "notes": ""}, {"date": "2026-04-03", "a1": 975, "a2": 713, "a3": 0, "k1": 60, "k2": 25, "k3": 0, "msm": 0, "hsm": 0, "online": 542, "holiday": "Good Friday", "notes": ""}, {"date": "2026-04-05", "a1": 1588, "a2": 2369, "a3": 0, "k1": 186, "k2": 58, "k3": 0, "msm": 0, "hsm": 0, "online": 1014, "holiday": "Easter", "notes": ""}, {"date": "2026-04-12", "a1": 642, "a2": 924, "a3": 0, "k1": 157, "k2": 162, "k3": 0, "msm": 97, "hsm": 112, "online": 873, "holiday": "", "notes": ""}, {"date": "2026-04-19", "a1": 781, "a2": 1006, "a3": 0, "k1": 168, "k2": 176, "k3": 0, "msm": 107, "hsm": 119, "online": 891, "holiday": "", "notes": ""}];
+const KEY = 'bt_v2';
+
+function loadData() {
+  try {
+    const s = localStorage.getItem(KEY);
+    if (!s) return [...SEED];
+    const added = JSON.parse(s);
+    const map = {};
+    SEED.forEach(r => map[r.date] = {...r});
+    added.forEach(r => map[r.date] = {...r});
+    return Object.values(map).sort((a,b)=>a.date.localeCompare(b.date));
+  } catch(e) { return [...SEED]; }
+}
+
+function saveData(data) {
+  const sm = {}; SEED.forEach(r=>sm[r.date]=r);
+  const diff = data.filter(r=>JSON.stringify(r)!==JSON.stringify(sm[r.date]));
+  localStorage.setItem(KEY, JSON.stringify(diff));
+}
+
+let DATA = loadData();
+
+// ══ HELPERS ═══════════════════════════════════════════════
+const tA = r => (r.a1||0)+(r.a2||0)+(r.a3||0);
+const tK = r => (r.k1||0)+(r.k2||0)+(r.k3||0);
+const tC = r => tA(r)+tK(r)+(r.msm||0)+(r.hsm||0);
+const tT = r => tC(r)+(r.online||0);
+const isTog = r => r && (r.notes||'').toLowerCase().includes('together');
+const rec = d => DATA.find(r=>r.date===d);
+
+function fmt(n) {
+  if (n===null||n===undefined||isNaN(n)) return '<span class="z">—</span>';
+  if (n===0) return '<span class="z">0</span>';
+  return Number(n).toLocaleString();
+}
+
+function pct(cur, prev) {
+  if (!prev) return '<span class="bn">—</span>';
+  const p = (cur-prev)/prev;
+  const lbl = (p>=0?'+':'')+(p*100).toFixed(1)+'%';
+  const c = p>=0.05?'bg':p<=-0.03?'br':'by';
+  return `<span class="b ${c}">${lbl}</span>`;
+}
+
+function fmtDate(s) {
+  const [y,m,d]=s.split('-').map(Number);
+  return new Date(y,m-1,d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+const HOLIDAYS = ['Easter','Good Friday','Christmas Eve','Christmas'];
+
+function lyDate(dateStr, holiday) {
+  if (holiday && HOLIDAYS.some(h=>holiday.startsWith(h.split(' ')[0]))) {
+    const ly = String(parseInt(dateStr)-1).padStart(4,'0'); // just year prefix trick
+    const lyYr = parseInt(dateStr.split('-')[0])-1;
+    const match = DATA.find(r=>r.holiday&&r.holiday.includes(holiday.split(' ')[0])&&r.date.startsWith(String(lyYr)));
+    if (match) return match.date;
+  }
+  const approx = new Date(dateStr+'T00:00:00');
+  approx.setDate(approx.getDate()-364);
+  let best=null, bd=Infinity;
+  DATA.forEach(r=>{
+    const diff=Math.abs(new Date(r.date+'T00:00:00')-approx);
+    if(diff<bd&&diff<15*864e5){bd=diff;best=r.date;}
+  });
+  return best;
+}
+
+// Monthly avg — smart: MSM/HSM only average weeks they met; exclude Together weeks
+function mAvg(yr, mo, getter, smartZero=false) {
+  const wks = DATA.filter(r=>{
+    const [y,m]=r.date.split('-').map(Number);
+    return y===yr && m===mo && !isTog(r);
+  });
+  if (!wks.length) return 0;
+  const vals = smartZero
+    ? wks.map(getter).filter(v=>v>0)
+    : wks.map(getter);
+  if (!vals.length) return 0;
+  return Math.round(vals.reduce((a,b)=>a+b,0)/vals.length);
+}
+
+function roll12(yr, mo, getter, smartZero=false) {
+  const avgs=[];
+  for(let i=0;i<12;i++){
+    let m=mo-i,y=yr;
+    while(m<=0){m+=12;y--;}
+    const a=mAvg(y,m,getter,smartZero);
+    if(a>0) avgs.push(a);
+  }
+  return avgs.length ? Math.round(avgs.reduce((a,b)=>a+b,0)/avgs.length) : 0;
+}
+
+// ══ WEEKLY ════════════════════════════════════════════════
+function renderWeekly() {
+  const ds = document.getElementById('wk-date').value;
+  if (!ds) return;
+  const r = rec(ds);
+  const hol = r?.holiday||'';
+  const tog = r ? isTog(r) : false;
+  const [yr,mo] = ds.split('-').map(Number);
+
+  // Last completed month (month before the selected Sunday's month)
+  const lcm  = mo === 1 ? 12 : mo - 1;
+  const lcmYr = mo === 1 ? yr - 1 : yr;
+
+  // Notices
+  const hn=document.getElementById('wk-holiday');
+  if (hol){hn.textContent=`⚠️  ${hol} — "Same Week Last Year" shows last year's ${hol} service.`;hn.classList.add('show');}
+  else hn.classList.remove('show');
+  const tn=document.getElementById('wk-together');
+  if (tog){tn.textContent='ℹ️  Together Sunday — Kids 1st grade+ joined Main Worship. Kids/MSM/HSM counts reflect nursery & pre-K only.';tn.classList.add('show');}
+  else tn.classList.remove('show');
+
+  const lyDs = lyDate(ds, hol);
+  const ly = lyDs ? rec(lyDs) : null;
+
+  // Summary strip
+  const sumEl=document.getElementById('wk-summary');
+  if (r) {
+    sumEl.innerHTML=`
+      <div class="sc"><div class="sl">Grand Total</div><div class="sv">${tT(r).toLocaleString()}</div><div class="ss2">In-person + online</div><div class="sb">${ly?pct(tT(r),tT(ly)):''}</div></div>
+      <div class="sc"><div class="sl">Carrollton</div><div class="sv">${tC(r).toLocaleString()}</div><div class="ss2">In-person total</div><div class="sb">${ly?pct(tC(r),tC(ly)):''}</div></div>
+      <div class="sc"><div class="sl">Adults</div><div class="sv">${tA(r).toLocaleString()}</div><div class="sb">${ly?pct(tA(r),tA(ly)):''}</div></div>
+      <div class="sc"><div class="sl">Kids Ministry</div><div class="sv">${tK(r).toLocaleString()}</div><div class="sb">${ly?pct(tK(r),tK(ly)):''}</div></div>
+      <div class="sc"><div class="sl">BT Online</div><div class="sv">${(r.online||0).toLocaleString()}</div><div class="sb">${ly?pct(r.online||0,ly.online||0):''}</div></div>`;
+  } else {
+    sumEl.innerHTML=`<p style="color:var(--g400);font-size:13px;grid-column:1/-1">No data for ${fmtDate(ds)}. <a href="#" onclick="nav('entry');document.getElementById('e-date').value='${ds}';onEntryDate();return false">Enter this week →</a></p>`;
+  }
+
+  document.getElementById('print-wk-date').textContent = `Report for ${fmtDate(ds)}`;
+
+  const lyLbl = lyDs
+    ? `Same Week LY<br><small style="font-weight:400;opacity:.8">${fmtDate(lyDs)}${hol?' ('+hol+')':''}</small>`
+    : 'Same Week LY';
+
+  const ROWS = [
+    {sec:'CARROLLTON CAMPUS'},
+    {lbl:'Main Worship (Adults)', cval:r?tA(r):0, lval:ly?tA(ly):null, get:r=>tA(r)},
+    {lbl:'Kids Ministry',         cval:r?tK(r):0, lval:ly?tK(ly):null, get:r=>tK(r)},
+    {lbl:'Middle School (MSM)',   cval:r?r.msm||0:0, lval:ly?ly.msm||0:null, get:r=>r.msm||0, smart:true},
+    {lbl:'High School (HSM)',     cval:r?r.hsm||0:0, lval:ly?ly.hsm||0:null, get:r=>r.hsm||0, smart:true},
+    {lbl:'Carrollton Total',      cval:r?tC(r):0, lval:ly?tC(ly):null, get:r=>tC(r), sub:true},
+    {sec:'ONLINE'},
+    {lbl:'BT Online',             cval:r?r.online||0:0, lval:ly?ly.online||0:null, get:r=>r.online||0},
+    {sec:'ALL VENUES'},
+    {lbl:'Grand Total',           cval:r?tT(r):0, lval:ly?tT(ly):null, get:r=>tT(r), grd:true},
+  ];
+
+  const lcmLbl = new Date(lcmYr,lcm-1,1).toLocaleString('default',{month:'short',year:'numeric'});
+  const lcmLyLbl = new Date(lcmYr-1,lcm-1,1).toLocaleString('default',{month:'short',year:'numeric'});
+
+  let h=`<thead><tr>
+    <th>Ministry</th><th>This Week</th><th>${lyLbl}</th><th>YOY Change</th>
+    <th>${lcmLbl} Avg<br><small style="font-weight:400;opacity:.8">(last completed month)</small></th>
+    <th>${lcmLyLbl} Avg</th><th>Monthly Change</th>
+    <th>12-Mo Moving Avg</th><th>LY 12-Mo Avg</th><th>Moving Avg Change</th>
+  </tr></thead><tbody>`;
+
+  ROWS.forEach(row=>{
+    if (row.sec){h+=`<tr class="sec"><td colspan="10">${row.sec}</td></tr>`;return;}
+    const ma   = mAvg(lcmYr, lcm,   row.get, !!row.smart);
+    const maly = mAvg(lcmYr-1, lcm, row.get, !!row.smart);
+    const r12  = roll12(yr,   mo, row.get, !!row.smart);
+    const r12ly= roll12(yr-1, mo, row.get, !!row.smart);
+    const cls  = row.grd?'grd':row.sub?'sub':'';
+    const lyV  = row.lval;
+    h+=`<tr class="${cls}">
+      <td>${row.lbl}</td>
+      <td class="num">${fmt(row.cval)}</td>
+      <td class="num">${lyV!==null?fmt(lyV):'<span class="z">—</span>'}</td>
+      <td>${lyV!==null&&lyV>0?pct(row.cval,lyV):'<span class="bn">—</span>'}</td>
+      <td class="num">${fmt(ma)}</td>
+      <td class="num">${fmt(maly)}</td>
+      <td>${ma&&maly?pct(ma,maly):'<span class="bn">—</span>'}</td>
+      <td class="num">${fmt(r12)}</td>
+      <td class="num">${fmt(r12ly)}</td>
+      <td>${r12&&r12ly?pct(r12,r12ly):'<span class="bn">—</span>'}</td>
+    </tr>`;
+  });
+  h+='</tbody>';
+  document.getElementById('wk-table').innerHTML=h;
+}
+
+// ══ MONTHLY ═══════════════════════════════════════════════
+function renderMonthly() {
+  const ms=document.getElementById('mo-month').value;
+  if(!ms) return;
+  const [yr,mo]=ms.split('-').map(Number);
+
+  // Last completed month relative to the selected month
+  const lcm   = mo === 1 ? 12 : mo - 1;
+  const lcmYr = mo === 1 ? yr - 1 : yr;
+
+  const selectedLbl = new Date(yr,mo-1,1).toLocaleString('default',{month:'long',year:'numeric'});
+  const lcmLbl      = new Date(lcmYr,lcm-1,1).toLocaleString('default',{month:'long',year:'numeric'});
+  const lcmLyLbl    = new Date(lcmYr-1,lcm-1,1).toLocaleString('default',{month:'long',year:'numeric'});
+  document.getElementById('print-mo-date').textContent=`Report for ${selectedLbl}`;
+
+  const ROWS=[
+    {sec:'CARROLLTON CAMPUS'},
+    {lbl:'Main Worship (Adults)',get:r=>tA(r)},
+    {lbl:'Kids Ministry',        get:r=>tK(r)},
+    {lbl:'Middle School (MSM)',  get:r=>r.msm||0, smart:true},
+    {lbl:'High School (HSM)',    get:r=>r.hsm||0, smart:true},
+    {lbl:'Carrollton Total',     get:r=>tC(r), sub:true},
+    {sec:'ONLINE'},
+    {lbl:'BT Online',            get:r=>r.online||0},
+    {sec:'ALL VENUES'},
+    {lbl:'Grand Total',          get:r=>tT(r), grd:true},
+  ];
+
+  let h=`<thead><tr>
+    <th>Ministry</th>
+    <th>${lcmLbl}<br>Monthly Avg<br><small style="font-weight:400;opacity:.8">(last completed month)</small></th>
+    <th>${lcmLyLbl}<br>Monthly Avg</th><th>YOY Change</th>
+    <th>${selectedLbl}<br>12-Mo Avg</th><th>${new Date(yr-1,mo-1,1).toLocaleString('default',{month:'long',year:'numeric'})}<br>12-Mo Avg</th><th>Mvg Avg Change</th>
+  </tr></thead><tbody>`;
+
+  ROWS.forEach(row=>{
+    if(row.sec){h+=`<tr class="sec"><td colspan="7">${row.sec}</td></tr>`;return;}
+    const ma   = mAvg(lcmYr,   lcm, row.get, !!row.smart);
+    const maly = mAvg(lcmYr-1, lcm, row.get, !!row.smart);
+    const r12  = roll12(yr,   mo, row.get, !!row.smart);
+    const r12ly= roll12(yr-1, mo, row.get, !!row.smart);
+    const cls=row.grd?'grd':row.sub?'sub':'';
+    h+=`<tr class="${cls}">
+      <td>${row.lbl}</td>
+      <td class="num">${fmt(ma)}</td><td class="num">${fmt(maly)}</td>
+      <td>${ma&&maly?pct(ma,maly):'<span class="bn">—</span>'}</td>
+      <td class="num">${fmt(r12)}</td><td class="num">${fmt(r12ly)}</td>
+      <td>${r12&&r12ly?pct(r12,r12ly):'<span class="bn">—</span>'}</td>
+    </tr>`;
+  });
+  h+='</tbody>';
+  document.getElementById('mo-table').innerHTML=h;
+
+  // 13-month trend
+  let th=`<thead><tr>
+    <th style="text-align:left">Month</th>
+    <th>Adults</th><th>Kids</th><th>MSM</th><th>HSM</th><th>Online</th><th>Grand Total</th>
+  </tr></thead><tbody>`;
+  for(let i=-12;i<=0;i++){
+    let m=mo+i,y=yr;
+    while(m<=0){m+=12;y--;}while(m>12){m-=12;y++;}
+    const isCur=(y===yr&&m===mo);
+    const lbl=new Date(y,m-1,1).toLocaleString('default',{month:'short',year:'numeric'});
+    const rs=(i+12)%2===0?'background:var(--g50)':'';
+    const rsCur='background:#eef3fb;font-weight:600';
+    th+=`<tr style="${isCur?rsCur:rs}">
+      <td style="font-weight:${isCur?'600':'400'}">${lbl}${isCur?' ◀':''}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>tA(r)))}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>tK(r)))}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>r.msm||0,true))}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>r.hsm||0,true))}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>r.online||0))}</td>
+      <td class="num">${fmt(mAvg(y,m,r=>tT(r)))}</td>
+    </tr>`;
+  }
+  th+='</tbody>';
+  document.getElementById('trend-table').innerHTML=th;
+}
+
+// ══ SERVICE BREAKDOWN ═════════════════════════════════════
+function renderService() {
+  const ds=document.getElementById('svc-date').value;
+  if(!ds) return;
+  const r=rec(ds);
+  const [yr,mo]=ds.split('-').map(Number);
+
+  let h='';
+  if(!r){
+    h=`<p style="color:var(--g400);font-size:13px">No data found for ${fmtDate(ds)}.</p>`;
+  } else {
+    h=`<table class="rt" style="max-width:480px">
+      <thead><tr><th style="text-align:left">Service</th><th>Adults</th><th>Kids</th><th>MSM / HSM</th></tr></thead>
+      <tbody>
+        <tr><td>1st Service</td><td class="num">${fmt(r.a1||0)}</td><td class="num">${fmt(r.k1||0)}</td><td class="num">${fmt(r.msm||0)} / ${fmt(r.hsm||0)}</td></tr>
+        <tr><td>2nd Service</td><td class="num">${fmt(r.a2||0)}</td><td class="num">${fmt(r.k2||0)}</td><td class="z">single service</td></tr>
+        ${(r.a3||r.k3)?`<tr><td>3rd Service</td><td class="num">${fmt(r.a3||0)}</td><td class="num">${fmt(r.k3||0)}</td><td class="z">—</td></tr>`:''}
+        <tr class="sub"><td>Carrollton Total</td><td class="num">${fmt(tA(r))}</td><td class="num">${fmt(tK(r))}</td><td class="num">${fmt((r.msm||0)+(r.hsm||0))}</td></tr>
+        <tr><td>BT Online</td><td class="num">${fmt(r.online||0)}</td><td class="z">—</td><td class="z">—</td></tr>
+        <tr class="grd"><td>Grand Total</td><td class="num" colspan="3">${fmt(tT(r))}</td></tr>
+      </tbody>
+    </table>`;
+  }
+  document.getElementById('svc-content').innerHTML=h;
+
+  // Service trend
+  let st=`<thead><tr>
+    <th style="text-align:left">Month</th>
+    <th>Adults 1st</th><th>Adults 2nd</th><th>Kids 1st</th><th>Kids 2nd</th>
+  </tr></thead><tbody>`;
+  for(let i=-12;i<=0;i++){
+    let m=mo+i,y=yr;
+    while(m<=0){m+=12;y--;}while(m>12){m-=12;y++;}
+    const isCur=(y===yr&&m===mo);
+    const lbl=new Date(y,m-1,1).toLocaleString('default',{month:'short',year:'numeric'});
+    const wks=DATA.filter(r2=>{const[ry,rm]=r2.date.split('-').map(Number);return ry===y&&rm===m&&!isTog(r2);});
+    function sAvg(fn){const v=wks.map(fn).filter(x=>x>0);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null;}
+    const rs=(i+12)%2===0?'background:var(--g50)':'';
+    st+=`<tr style="${isCur?'background:#eef3fb;font-weight:600':rs}">
+      <td>${lbl}${isCur?' ◀':''}</td>
+      <td class="num">${fmt(sAvg(r2=>r2.a1||0))}</td>
+      <td class="num">${fmt(sAvg(r2=>r2.a2||0))}</td>
+      <td class="num">${fmt(sAvg(r2=>r2.k1||0))}</td>
+      <td class="num">${fmt(sAvg(r2=>r2.k2||0))}</td>
+    </tr>`;
+  }
+  st+='</tbody>';
+  document.getElementById('svc-trend').innerHTML=st;
+}
+
+// ══ ENTRY ═════════════════════════════════════════════════
+function gn(id){return parseInt(document.getElementById(id).value)||0;}
+
+function onEntryDate() {
+  const d=document.getElementById('e-date').value;
+  const ex=rec(d);
+  const notice=document.getElementById('e-exists');
+  if(ex&&d){
+    notice.style.display='block';
+    notice.innerHTML=`<strong>Data exists for ${fmtDate(d)}.</strong> Saving will overwrite it.`;
+    document.getElementById('e-a1').value=ex.a1||'';
+    document.getElementById('e-a2').value=ex.a2||'';
+    document.getElementById('e-a3').value=ex.a3||'';
+    document.getElementById('e-k1').value=ex.k1||'';
+    document.getElementById('e-k2').value=ex.k2||'';
+    document.getElementById('e-k3').value=ex.k3||'';
+    document.getElementById('e-msm').value=ex.msm||'';
+    document.getElementById('e-hsm').value=ex.hsm||'';
+    document.getElementById('e-online').value=ex.online||'';
+    document.getElementById('e-hol').value=ex.holiday||'';
+    document.getElementById('e-tog').value=isTog(ex)?'Together Sunday':'';
+    document.getElementById('e-notes').value=ex.notes||'';
+  } else {
+    notice.style.display='none';
+  }
+  livePreview();
+}
+
+function livePreview() {
+  const d=document.getElementById('e-date').value;
+  const a=gn('e-a1')+gn('e-a2')+gn('e-a3');
+  const k=gn('e-k1')+gn('e-k2')+gn('e-k3');
+  const msm=gn('e-msm'),hsm=gn('e-hsm'),onl=gn('e-online');
+  const tc=a+k+msm+hsm,tot=tc+onl;
+  const hol=document.getElementById('e-hol').value;
+  const tog=document.getElementById('e-tog').value;
+  document.getElementById('e-preview').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:13px;line-height:2">
+      <tr><td style="color:var(--g400);width:55%">Date</td><td style="font-weight:600">${d?fmtDate(d):'—'}</td></tr>
+      ${hol?`<tr><td style="color:var(--g400)">Holiday</td><td><span class="tag">${hol}</span></td></tr>`:''}
+      ${tog?`<tr><td style="color:var(--g400)">Together Sunday</td><td><span class="tag tag-blue">Yes</span></td></tr>`:''}
+      <tr style="border-top:1px solid var(--g100)"><td colspan="2" style="padding-top:6px;font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px">Carrollton</td></tr>
+      <tr><td style="color:var(--g600);padding-left:8px">Adults</td><td style="font-weight:600">${a.toLocaleString()}</td></tr>
+      <tr><td style="color:var(--g600);padding-left:8px">Kids</td><td style="font-weight:600">${k.toLocaleString()}</td></tr>
+      <tr><td style="color:var(--g600);padding-left:8px">MSM</td><td style="font-weight:600">${msm.toLocaleString()}</td></tr>
+      <tr><td style="color:var(--g600);padding-left:8px">HSM</td><td style="font-weight:600">${hsm.toLocaleString()}</td></tr>
+      <tr style="background:var(--g50)"><td style="padding-left:4px;font-weight:600">Carrollton Total</td><td style="font-weight:700;font-size:17px">${tc.toLocaleString()}</td></tr>
+      <tr style="border-top:1px solid var(--g100)"><td colspan="2" style="padding-top:6px;font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px">Online</td></tr>
+      <tr><td style="color:var(--g600);padding-left:8px">BT Online</td><td style="font-weight:600">${onl.toLocaleString()}</td></tr>
+      <tr style="background:var(--navy);color:#fff"><td style="padding:8px 4px;font-weight:700">Grand Total</td><td style="padding:8px 4px;font-weight:700;font-size:19px">${tot.toLocaleString()}</td></tr>
+    </table>`;
+}
+
+function saveEntry() {
+  const d=document.getElementById('e-date').value;
+  if(!d){toast('Please enter a date first.','err');return;}
+  const tog=document.getElementById('e-tog').value;
+  const manual=document.getElementById('e-notes').value.trim();
+  const notes=[tog,manual].filter(Boolean).join('; ');
+  const entry={
+    date:d,
+    a1:gn('e-a1'),a2:gn('e-a2'),a3:gn('e-a3'),
+    k1:gn('e-k1'),k2:gn('e-k2'),k3:gn('e-k3'),
+    msm:gn('e-msm'),hsm:gn('e-hsm'),online:gn('e-online'),
+    holiday:document.getElementById('e-hol').value,
+    notes
+  };
+  const i=DATA.findIndex(r=>r.date===d);
+  if(i>=0)DATA[i]=entry;else DATA.push(entry);
+  DATA.sort((a,b)=>a.date.localeCompare(b.date));
+  saveData(DATA);
+  toast(`Saved ${fmtDate(d)} ✓`,'ok');
+  clearEntry();
+  document.getElementById('wk-date').value=d;
+  renderWeekly();
+}
+
+function clearEntry(){
+  ['e-a1','e-a2','e-a3','e-k1','e-k2','e-k3','e-msm','e-hsm','e-online'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('e-hol').value='';
+  document.getElementById('e-tog').value='';
+  document.getElementById('e-notes').value='';
+  document.getElementById('e-exists').style.display='none';
+  document.getElementById('e-preview').innerHTML='<p style="color:var(--g400);font-size:13px">Enter a date and numbers to see a preview.</p>';
+}
+
+// ══ HISTORY ═══════════════════════════════════════════════
+function renderHistory() {
+  const q=(document.getElementById('h-search').value||'').toLowerCase();
+  const yr=document.getElementById('h-year').value;
+  let rows=[...DATA].reverse();
+  if(yr) rows=rows.filter(r=>r.date.startsWith(yr));
+  if(q) rows=rows.filter(r=>
+    r.date.includes(q)||fmtDate(r.date).toLowerCase().includes(q)||
+    (r.holiday||'').toLowerCase().includes(q)||(r.notes||'').toLowerCase().includes(q));
+
+  let h=`<thead><tr>
+    <th style="text-align:left">Date</th>
+    <th>Adults</th><th>Kids</th><th>MSM</th><th>HSM</th><th>Online</th>
+    <th>Carrollton</th><th>Grand Total</th><th class="no-print"></th>
+  </tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const hol=r.holiday?`<span class="tag">${r.holiday}</span>`:'';
+    const tog=isTog(r)?`<span class="tag tag-blue">Together</span>`:'';
+    h+=`<tr>
+      <td><strong>${fmtDate(r.date)}</strong>${hol}${tog}
+        ${r.notes?`<div style="font-size:11px;color:var(--g400)">${r.notes}</div>`:''}
+      </td>
+      <td class="num">${fmt(tA(r))}</td><td class="num">${fmt(tK(r))}</td>
+      <td class="num">${fmt(r.msm||0)}</td><td class="num">${fmt(r.hsm||0)}</td>
+      <td class="num">${fmt(r.online||0)}</td>
+      <td class="num">${fmt(tC(r))}</td>
+      <td class="num" style="font-weight:700">${fmt(tT(r))}</td>
+      <td class="no-print"><button class="btn bs" style="background:var(--g100);color:var(--g600)" onclick="editRec('${r.date}')">Edit</button></td>
+    </tr>`;
+  });
+  if(!rows.length) h+='<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--g400)">No records found</td></tr>';
+  h+='</tbody>';
+  document.getElementById('h-table').innerHTML=h;
+}
+
+function editRec(d){nav('entry');document.getElementById('e-date').value=d;onEntryDate();}
+
+function populateYears(){
+  const yrs=[...new Set(DATA.map(r=>r.date.split('-')[0]))].sort().reverse();
+  const s=document.getElementById('h-year');
+  yrs.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;s.appendChild(o);});
+}
+
+// ══ EXPORT / IMPORT ═══════════════════════════════════════
+function exportData(){
+  const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`bent_tree_attendance_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  toast('Data file downloaded ✓','ok');
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const imported=JSON.parse(ev.target.result);
+      if(!Array.isArray(imported)||!imported[0]?.date) throw new Error('Invalid format');
+      const map={};
+      DATA.forEach(r=>map[r.date]={...r});
+      imported.forEach(r=>map[r.date]={...r});
+      DATA=Object.values(map).sort((a,b)=>a.date.localeCompare(b.date));
+      saveData(DATA);
+      populateYears();
+      toast(`Imported ${imported.length} records ✓`,'ok');
+    }catch(err){toast('Import failed — invalid file.','err');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+// ══ PRINT ═════════════════════════════════════════════════
+function printWeekly(){
+  document.body.className = 'print-weekly';
+  window.print();
+  document.body.className = '';
+}
+function printMonthly(){
+  document.body.className = 'print-monthly';
+  window.print();
+  document.body.className = '';
+}
+
+// ══ NAV ═══════════════════════════════════════════════════
+const PAGES=['weekly','monthly','service','entry','history','settings'];
+let currentPage='weekly';
+function nav(name){
+  currentPage=name;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const idx=PAGES.indexOf(name);
+  if(idx>=0) document.querySelectorAll('nav button')[idx].classList.add('active');
+  if(name==='history') renderHistory();
+  if(name==='weekly')  renderWeekly();
+  if(name==='monthly') renderMonthly();
+  if(name==='service') renderService();
+}
+
+// ══ TOAST ═════════════════════════════════════════════════
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+type;
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ══ INIT ══════════════════════════════════════════════════
+function init(){
+  populateYears();
+  const last=DATA[DATA.length-1].date;
+  document.getElementById('wk-date').value=last;
+  document.getElementById('svc-date').value=last;
+  const now=new Date();
+  const lm=now.getMonth()===0
+    ?`${now.getFullYear()-1}-12`
+    :`${now.getFullYear()}-${String(now.getMonth()).padStart(2,'0')}`;
+  document.getElementById('mo-month').value=lm;
+  renderWeekly();
+  renderMonthly();
+}
+init();
+</script>
+</body>
+</html>
