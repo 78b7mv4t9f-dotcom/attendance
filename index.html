@@ -33,6 +33,7 @@ nav{display:flex;gap:3px;flex-wrap:wrap}
 nav button{background:transparent;border:none;color:rgba(255,255,255,.65);padding:7px 13px;border-radius:6px;font-size:13px;font-weight:600;transition:all .15s;white-space:nowrap;font-family:'Nunito Sans',sans-serif;text-transform:uppercase;letter-spacing:.4px;font-size:11.5px}
 nav button:hover{background:rgba(255,255,255,.1);color:#fff}
 nav button.active{background:var(--green);color:#fff;font-weight:700}
+.protected-nav{display:none}
 
 /* LAYOUT */
 main{max-width:1140px;margin:0 auto;padding:24px}
@@ -192,9 +193,9 @@ main{max-width:1140px;margin:0 auto;padding:24px}
     <button class="active" onclick="nav('weekly')">Weekly Report</button>
     <button onclick="nav('monthly')">Monthly Report</button>
     <button onclick="nav('service')">Service Breakdown</button>
-    <button onclick="nav('entry')">Enter Data</button>
-    <button onclick="nav('history')">History</button>
-    <button onclick="nav('settings')">⚙ Data</button>
+    <button onclick="nav('entry')" class="protected-nav">Enter Data</button>
+    <button onclick="nav('history')" class="protected-nav">History</button>
+    <button onclick="nav('settings')" class="protected-nav">⚙ Data</button>
   </nav>
 </div>
 </header>
@@ -535,7 +536,7 @@ function renderWeekly() {
       <div class="sc"><div class="sl">Kids Ministry</div><div class="sv">${tK(r).toLocaleString()}</div><div class="sb">${ly?pct(tK(r),tK(ly)):''}</div></div>
       <div class="sc"><div class="sl">BT Online</div><div class="sv">${(r.online||0).toLocaleString()}</div><div class="sb">${ly?pct(r.online||0,ly.online||0):''}</div></div>`;
   } else {
-    sumEl.innerHTML=`<p style="color:var(--g400);font-size:13px;grid-column:1/-1">No data for ${fmtDate(ds)}. <a href="#" onclick="nav('entry');document.getElementById('e-date').value='${ds}';onEntryDate();return false">Enter this week →</a></p>`;
+    sumEl.innerHTML=`<p style="color:var(--g400);font-size:13px;grid-column:1/-1">No data for ${fmtDate(ds)}.</p>`;
   }
 
   document.getElementById('print-wk-date').textContent = `Report for ${fmtDate(ds)}`;
@@ -834,7 +835,10 @@ function renderHistory() {
       <td class="num">${fmt(r.online||0)}</td>
       <td class="num">${fmt(tC(r))}</td>
       <td class="num" style="font-weight:700">${fmt(tT(r))}</td>
-      <td class="no-print"><button class="btn bs" style="background:var(--g100);color:var(--g600)" onclick="editRec('${r.date}')">Edit</button></td>
+      <td class="no-print" style="white-space:nowrap">
+        <button class="btn bs" style="background:var(--g100);color:var(--g600)" onclick="editRec('${r.date}')">Edit</button>
+        <button class="btn bs" style="background:#fcecea;color:var(--neg);margin-left:4px" onclick="deleteRec('${r.date}')">Delete</button>
+      </td>
     </tr>`;
   });
   if(!rows.length) h+='<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--g400)">No records found</td></tr>';
@@ -843,6 +847,14 @@ function renderHistory() {
 }
 
 function editRec(d){nav('entry');document.getElementById('e-date').value=d;onEntryDate();}
+
+function deleteRec(d) {
+  if (!confirm(`Delete the record for ${fmtDate(d)}? This cannot be undone.`)) return;
+  DATA = DATA.filter(r => r.date !== d);
+  saveData(DATA);
+  renderHistory();
+  toast(`Deleted ${fmtDate(d)}`, 'ok');
+}
 
 function populateYears(){
   const yrs=[...new Set(DATA.map(r=>r.date.split('-')[0]))].sort().reverse();
@@ -918,6 +930,12 @@ function toast(msg,type=''){
 
 // ══ INIT ══════════════════════════════════════════════════
 function init(){
+  // Check for access code in URL — ?access=entry unlocks Entry, History, Data tabs
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('access') === 'entry') {
+    document.querySelectorAll('.protected-nav').forEach(el => el.style.display = 'inline-flex');
+  }
+
   populateYears();
   const last=DATA[DATA.length-1].date;
   document.getElementById('wk-date').value=last;
