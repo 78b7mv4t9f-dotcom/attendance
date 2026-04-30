@@ -455,6 +455,10 @@ async function loadData() {
         };
       });
       DATA = Object.values(map).sort((a,b) => a.date.localeCompare(b.date));
+      // Update date pickers to the latest date now that sheet data is loaded
+      const latest = DATA[DATA.length-1].date;
+      document.getElementById('wk-date').value = latest;
+      document.getElementById('svc-date').value = latest;
       populateYears();
       renderWeekly();
       renderMonthly();
