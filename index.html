@@ -422,16 +422,31 @@ function hideLoading() {
 async function loadData() {
   showLoading('Syncing with Google Sheets…');
   try {
-    const res = await fetch(SCRIPT_URL + '?_=' + Date.now(), {
-      redirect: 'follow'
-    });
+    const res = await fetch(SCRIPT_URL + '?_=' + Date.now(), { redirect: 'follow' });
     const json = await res.json();
     if (json.status === 'ok' && json.data && json.data.length > 0) {
       const map = {};
       SEED.forEach(r => map[r.date] = {...r});
       json.data.forEach(r => {
-        map[r.date] = {
-          date: r.date,
+        // Normalize the date — Google Sheets may return it in various formats
+        let d = r.date;
+        if (!d) return;
+        d = String(d).trim();
+        // If it came back as a JS Date object serial or locale string, convert it
+        if (d.includes('/')) {
+          // e.g. "4/27/2026" → "2026-04-27"
+          const parts = d.split('/');
+          if (parts.length === 3) {
+            const mo = parts[0].padStart(2,'0');
+            const dy = parts[1].padStart(2,'0');
+            const yr = parts[2].length === 2 ? '20'+parts[2] : parts[2];
+            d = `${yr}-${mo}-${dy}`;
+          }
+        }
+        // Make sure it looks like YYYY-MM-DD
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+        map[d] = {
+          date: d,
           a1: Number(r.a1)||0, a2: Number(r.a2)||0, a3: Number(r.a3)||0,
           k1: Number(r.k1)||0, k2: Number(r.k2)||0, k3: Number(r.k3)||0,
           msm: Number(r.msm)||0, hsm: Number(r.hsm)||0,
@@ -443,6 +458,7 @@ async function loadData() {
       populateYears();
       renderWeekly();
       renderMonthly();
+      console.log('Google Sheets sync OK —', json.data.length, 'records loaded');
     }
   } catch(e) {
     console.warn('Could not reach Google Sheets, using built-in data.', e);
