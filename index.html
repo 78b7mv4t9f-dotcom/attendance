@@ -422,7 +422,9 @@ function hideLoading() {
 async function loadData() {
   showLoading('Syncing with Google Sheets…');
   try {
-    const res = await fetch(SCRIPT_URL);
+    const res = await fetch(SCRIPT_URL + '?_=' + Date.now(), {
+      redirect: 'follow'
+    });
     const json = await res.json();
     if (json.status === 'ok' && json.data && json.data.length > 0) {
       const map = {};
@@ -453,6 +455,7 @@ async function saveData(record) {
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'save', record })
     });
   } catch(e) {
@@ -466,6 +469,7 @@ async function deleteFromSheet(date) {
   try {
     await fetch(SCRIPT_URL, {
       method: 'POST',
+      redirect: 'follow',
       body: JSON.stringify({ action: 'delete', date })
     });
   } catch(e) {
